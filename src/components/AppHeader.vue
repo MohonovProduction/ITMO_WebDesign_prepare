@@ -9,6 +9,7 @@ const links = [
   { to: '/', label: 'Главная', icon: 'home' },
   { to: '/tracks', label: 'Карта экзамена', icon: 'account_tree' },
   { to: '/theory', label: 'Темы', icon: 'menu_book' },
+  { to: '/flashcards', label: 'Карточки', icon: 'style' },
 ]
 
 function isActive(to) {
