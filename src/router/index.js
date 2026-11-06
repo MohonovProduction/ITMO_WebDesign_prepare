@@ -28,6 +28,12 @@ const routes = [
     component: () => import('@/views/PracticeView.vue'),
     meta: { title: 'Тренировка ответа' },
   },
+  {
+    path: '/semantics',
+    name: 'semantics',
+    component: () => import('@/views/SemanticsView.vue'),
+    meta: { title: 'Семантика HTML' },
+  },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
