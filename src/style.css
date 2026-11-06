@@ -1,0 +1,242 @@
+@import 'katex/dist/katex.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  @apply text-slate-800 antialiased;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, 'Noto Color Emoji', sans-serif;
+  background-color: #f7f9fc;
+  /* Едва заметный орнамент (статистический мотив) поверх мягкого пастельного градиента */
+  background-image:
+    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='84'%20height='84'%20viewBox='0%200%2084%2084'%3E%3Cg%20fill='none'%20stroke='%23475569'%20stroke-width='1.2'%20stroke-linecap='round'%20opacity='0.06'%3E%3Cpath%20d='M6%2056%20q12%20-30%2024%200'/%3E%3Ccircle%20cx='62'%20cy='22'%20r='3'/%3E%3Cpath%20d='M54%2060%20h12%20M60%2054%20v12'/%3E%3Cpath%20d='M10%2016%20h16'/%3E%3Ccircle%20cx='20'%20cy='70'%20r='1.6'/%3E%3Cpath%20d='M70%2068%20q-8%20-10%20-16%200'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(circle at 0% 0%, rgba(251, 248, 204, 0.55), transparent 42%),
+    radial-gradient(circle at 100% 0%, rgba(241, 192, 232, 0.5), transparent 42%),
+    radial-gradient(circle at 100% 100%, rgba(152, 245, 225, 0.5), transparent 42%),
+    radial-gradient(circle at 0% 100%, rgba(163, 196, 243, 0.5), transparent 42%);
+  background-attachment: fixed;
+}
+
+#app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Material Symbols (Rounded) */
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  vertical-align: middle;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+           transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-brand-gradient text-slate-800;
+  }
+  .btn-primary:hover {
+    filter: brightness(0.97) saturate(1.1);
+  }
+  /* Пастельный «брендовый» градиент для заливок с подложкой (на нём — тёмный текст). */
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      120deg,
+      rgb(251, 248, 204) 0%,
+      rgb(255, 207, 210) 22%,
+      rgb(241, 192, 232) 42%,
+      rgb(207, 186, 240) 60%,
+      rgb(163, 196, 243) 78%,
+      rgb(152, 245, 225) 100%
+    );
+  }
+  /* Насыщенный градиент для градиентного ТЕКСТА (читаем на белом). */
+  .text-gradient {
+    background-image: linear-gradient(90deg, #8ca2f1,#b293db,#f396c9,#fac53f,#f23e42);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+  /* Ссылка-пункт меню: тёмный читаемый текст + градиентное подчёркивание. */
+  .link-gradient {
+    position: relative;
+  }
+  .link-gradient::after {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.3rem;
+    height: 2px;
+    border-radius: 2px;
+    background-image: linear-gradient(
+      90deg,
+      hsla(332, 100%, 61%, 1) 0%,
+      hsla(200, 100%, 56%, 1) 32%,
+      hsla(143, 100%, 61%, 1) 65%,
+      hsla(265, 100%, 69%, 1) 100%
+    );
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.22s ease;
+  }
+  .link-gradient:hover::after,
+  .link-gradient.is-active::after {
+    transform: scaleX(1);
+  }
+  .btn-secondary {
+    @apply btn bg-white text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-50;
+  }
+  .btn-success {
+    @apply btn text-white;
+    background-color: #57b98a;
+  }
+  .btn-success:hover {
+    background-color: #4aa87b;
+  }
+  .btn-danger {
+    @apply btn text-white;
+    background-color: #e7788f;
+  }
+  .btn-danger:hover {
+    background-color: #de647e;
+  }
+  .card {
+    @apply rounded-2xl bg-white/95 shadow-sm ring-1 ring-slate-100 backdrop-blur-sm;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+}
+
+/* Цветные эмодзи Google Noto */
+.emoji {
+  font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+  font-weight: normal;
+  line-height: 1;
+}
+
+/* Сдержанный размер формул KaTeX внутри потока текста */
+.katex {
+  font-size: 1.05em;
+}
+
+/* Анимация переворота карточки */
+.flip-card {
+  perspective: 1600px;
+}
+.flip-inner {
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+@media print {
+  header, footer, nav { display: none !important; }
+  main { max-width: 100% !important; padding: 0 !important; }
+  .cheatsheet-print > *:not(.cheatsheet-print-root) { display: none !important; }
+  body.printing-cheatsheet-compact .cheatsheet-print-root,
+  body.printing-cheatsheet-full .cheatsheet-print-root { display: block !important; }
+}
+
+@page cheatsheet-compact {
+  size: A4 landscape;
+  margin: 6mm;
+}
+
+body.printing-cheatsheet-compact .cheatsheet-compact-print {
+  page: cheatsheet-compact;
+  font-size: 7pt;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+body.printing-cheatsheet-compact .cheatsheet-print-table,
+body.printing-cheatsheet-full .cheatsheet-print-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+body.printing-cheatsheet-compact .cheatsheet-print-th,
+body.printing-cheatsheet-compact .cheatsheet-print-td {
+  border: 0.5pt solid #e2e8f0;
+  padding: 1mm 1.5mm;
+  vertical-align: top;
+  font-size: 6.5pt;
+}
+
+body.printing-cheatsheet-compact .cheatsheet-print-th {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+body.printing-cheatsheet-compact .cheatsheet-print-row {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+body.printing-cheatsheet-full .cheatsheet-full-print {
+  font-size: 8pt;
+}
+
+body.printing-cheatsheet-full .cheatsheet-print-th,
+body.printing-cheatsheet-full .cheatsheet-print-td {
+  border: 0.5pt solid #e2e8f0;
+  padding: 1.5mm 2mm;
+  vertical-align: top;
+  font-size: 7.5pt;
+}
+
+body.printing-cheatsheet-full .cheatsheet-print-th {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+body.printing-cheatsheet-full .cheatsheet-print-row {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+body.printing-cheatsheet-full .cheatsheet-print-mnemonic {
+  font-style: italic;
+  font-size: 7pt;
+}

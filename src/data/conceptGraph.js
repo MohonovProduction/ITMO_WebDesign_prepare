@@ -1,0 +1,33 @@
+export const conceptNodes = [
+  { id: 'pop', label: 'Ген. совокупность', level: 'basics', theoryId: 8, x: 50, y: 5 },
+  { id: 'sample', label: 'Выборка', level: 'basics', theoryId: 8, x: 50, y: 18 },
+  { id: 'edf', label: 'EDF $F_n$', level: 'basics', theoryId: 1, x: 20, y: 32 },
+  { id: 'hist', label: 'Гистограмма', level: 'basics', theoryId: 3, x: 80, y: 32 },
+  { id: 'mean', label: 'Среднее', level: 'basics', theoryId: 5, x: 35, y: 48 },
+  { id: 'var', label: 'Дисперсия', level: 'basics', theoryId: 6, x: 65, y: 48 },
+  { id: 'mle', label: 'ММП', level: 'methods', theoryId: 12, x: 25, y: 62 },
+  { id: 'mom', label: 'Моменты', level: 'methods', theoryId: 11, x: 75, y: 62 },
+  { id: 'test', label: 'Проверка гипотез', level: 'methods', theoryId: 14, x: 50, y: 75 },
+  { id: 'tstat', label: 't-критерий', level: 'methods', theoryId: 16, x: 30, y: 88 },
+  { id: 'ci', label: 'ДИ', level: 'methods', theoryId: 18, x: 70, y: 88 },
+  { id: 'kolm', label: 'Колмогоров', level: 'analysis', theoryId: 22, x: 25, y: 95 },
+  { id: 'pearson', label: 'Пирсон', level: 'analysis', theoryId: 23, x: 50, y: 95 },
+  { id: 'reg', label: 'Регрессия', level: 'analysis', theoryId: 27, x: 75, y: 95 },
+]
+
+export const conceptEdges = [
+  { from: 'pop', to: 'sample' },
+  { from: 'sample', to: 'edf' },
+  { from: 'sample', to: 'hist' },
+  { from: 'sample', to: 'mean' },
+  { from: 'mean', to: 'var' },
+  { from: 'sample', to: 'mle' },
+  { from: 'sample', to: 'mom' },
+  { from: 'mle', to: 'test' },
+  { from: 'mom', to: 'test' },
+  { from: 'test', to: 'tstat' },
+  { from: 'test', to: 'ci' },
+  { from: 'test', to: 'kolm' },
+  { from: 'test', to: 'pearson' },
+  { from: 'sample', to: 'reg' },
+]
