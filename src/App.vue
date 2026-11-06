@@ -23,8 +23,8 @@ onMounted(() => {
 
   <footer class="border-t border-slate-200/70 bg-white/50 backdrop-blur-sm">
     <div class="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 px-4 py-6 text-center sm:px-6">
-      <p class="text-sm font-medium text-slate-600">Тренажёр для подготовки к экзамену по веб-проектированию</p>
-      <p class="text-xs text-slate-400">Санкт-Петербург, 2026</p>
+      <p class="text-sm font-medium text-slate-600">Разработано с любовью к дизайну <span class="material-symbols-rounded text-gradient" style="font-size: 1.6rem">favorite</span></p>
+      <p class="text-xs text-slate-400">Университет ИТМО, Санкт-Петербург, 2026</p>
       <p class="mt-1 text-[11px] text-slate-300">Черновой этап · структура экзамена и карта тем</p>
     </div>
   </footer>
