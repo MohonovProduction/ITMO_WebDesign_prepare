@@ -22,6 +22,12 @@ const routes = [
     component: () => import('@/views/FlashcardsView.vue'),
     meta: { title: 'Карточки' },
   },
+  {
+    path: '/practice',
+    name: 'practice',
+    component: () => import('@/views/PracticeView.vue'),
+    meta: { title: 'Тренировка ответа' },
+  },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 

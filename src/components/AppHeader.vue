@@ -10,6 +10,7 @@ const links = [
   { to: '/tracks', label: 'Карта экзамена', icon: 'account_tree' },
   { to: '/theory', label: 'Темы', icon: 'menu_book' },
   { to: '/flashcards', label: 'Карточки', icon: 'style' },
+  { to: '/practice', label: 'Билет', icon: 'school' },
 ]
 
 function isActive(to) {

@@ -45,6 +45,14 @@ import { topicsByTrack } from '@/data/webTheory'
       </div>
     </RouterLink>
 
+    <RouterLink to="/practice" class="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md">
+      <div class="emoji flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-brand-50 text-2xl">🎓</div>
+      <div>
+        <h2 class="font-bold text-slate-900">Тренировка билета</h2>
+        <p class="text-sm text-slate-500">Случайные вопросы, опорный план и самооценка устного ответа.</p>
+      </div>
+    </RouterLink>
+
     <section class="card p-5">
       <h2 class="text-lg font-bold text-slate-900">Как будет устроена подготовка</h2>
       <p class="mt-2 max-w-2xl text-sm text-slate-600">
