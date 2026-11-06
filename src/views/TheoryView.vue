@@ -58,12 +58,33 @@ watch(() => route.query.track, (track) => {
       <article v-for="topic in items" :key="topic.id" class="card p-5">
         <div class="flex gap-4">
           <span class="text-lg font-extrabold text-slate-300">{{ topic.number }}</span>
-          <div>
-            <h2 class="font-bold text-slate-900">{{ topic.title }}</h2>
-            <p class="mt-1 text-sm text-slate-500">Карточка ответа будет собрана по этой схеме:</p>
-            <ol class="mt-2 flex flex-wrap gap-2">
-              <li v-for="step in topic.answerPlan" :key="step" class="chip bg-slate-100 text-slate-600">{{ step }}</li>
-            </ol>
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 class="font-bold text-slate-900">{{ topic.title }}</h2>
+              <span class="chip" :class="topic.status === 'ready' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'">
+                {{ topic.status === 'ready' ? 'Тема готова' : 'В плане наполнения' }}
+              </span>
+            </div>
+            <template v-if="topic.status === 'ready'">
+              <p class="mt-3 text-sm leading-relaxed text-slate-700">{{ topic.definition }}</p>
+              <p class="mt-2 text-sm text-slate-500"><span class="font-semibold text-slate-600">Зачем учить:</span> {{ topic.why }}</p>
+              <details class="mt-4 rounded-xl bg-slate-50 p-4">
+                <summary class="cursor-pointer font-semibold text-slate-700">Открыть структуру ответа на билет</summary>
+                <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
+                  <li v-for="step in topic.answerOutline" :key="step">{{ step }}</li>
+                </ol>
+                <h3 class="mt-4 text-sm font-semibold text-slate-700">Типичные ошибки</h3>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+                  <li v-for="pitfall in topic.pitfalls" :key="pitfall">{{ pitfall }}</li>
+                </ul>
+              </details>
+            </template>
+            <template v-else>
+              <p class="mt-1 text-sm text-slate-500">Карточка ответа будет собрана по этой схеме:</p>
+              <ol class="mt-2 flex flex-wrap gap-2">
+                <li v-for="step in topic.answerPlan" :key="step" class="chip bg-slate-100 text-slate-600">{{ step }}</li>
+              </ol>
+            </template>
           </div>
         </div>
       </article>
