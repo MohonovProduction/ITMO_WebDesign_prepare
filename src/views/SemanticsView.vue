@@ -30,7 +30,7 @@ function isRelated(item) {
       <p class="mt-1 max-w-3xl text-slate-500">Откройте карточку тега — он и путь к нему подсветятся в дереве страницы. Цвет отражает группу, как в IDE.</p>
     </header>
 
-    <div v-if="selected" class="sticky top-3 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">
+    <div v-if="selected" class="sticky top-20 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">
       <span><code class="font-mono text-brand-100">&lt;{{ selected.tag }}&gt;</code><span class="mx-2 text-slate-500">·</span><span class="font-mono text-slate-200">{{ selected.path.join(' > ') }}</span></span>
       <button type="button" class="rounded-lg bg-white/10 px-3 py-1.5 font-semibold text-white hover:bg-white/20" @click="clearSelection">Снять выделение</button>
     </div>
