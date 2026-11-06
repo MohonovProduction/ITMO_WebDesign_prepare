@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import MathText from '@/components/MathText.vue'
 import Formula from '@/components/Formula.vue'
+import RichText from '@/components/RichText.vue'
 
 const props = defineProps({
   card: { type: Object, required: true },
@@ -37,10 +38,10 @@ const theoryLink = computed(() =>
             {{ isFormulaRecall ? 'Задание' : 'Вопрос' }}
           </span>
           <div class="text-xl font-semibold leading-snug text-slate-900 sm:text-2xl">
-            <MathText :text="card.front" />
+            <RichText :text="card.front" />
           </div>
           <p v-if="card.purposeFor && !isFormulaRecall" class="max-w-md text-xs text-slate-500">
-            <MathText :text="card.purposeFor" />
+            <RichText :text="card.purposeFor" />
           </p>
           <p v-if="isFormulaRecall" class="max-w-md text-sm text-slate-500">
             Запишите формулу на бумаге, затем переверните и сверьте.
@@ -59,7 +60,7 @@ const theoryLink = computed(() =>
             <Formula :expr="card.back" />
           </div>
           <div v-else class="text-base leading-relaxed text-slate-800 sm:text-lg">
-            <MathText :text="card.back" />
+            <RichText :text="card.back" />
           </div>
           <RouterLink
             v-if="isFormulaRecall && theoryLink"

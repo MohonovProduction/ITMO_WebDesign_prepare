@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { webTheory } from '@/data/webTheory'
 import { TRACKS } from '@/data/tracks'
+import RichText from '@/components/RichText.vue'
 
 const STORAGE_KEY = 'webdesign_practice_v1'
 const mode = ref('mixed')
@@ -99,11 +100,11 @@ function trackTitle(id) { return TRACKS.find((track) => track.id === id)?.shortT
 
         <div v-if="revealed" class="mt-5 rounded-xl bg-brand-50 p-4">
           <p class="font-semibold text-slate-800">Ключевая мысль</p>
-          <p class="mt-1 text-sm leading-relaxed text-slate-700">{{ topic.definition }}</p>
+          <div class="mt-1 text-sm leading-relaxed text-slate-700"><RichText :text="topic.definition" /></div>
           <ol class="mt-4 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
-            <li v-for="step in topic.answerOutline" :key="step">{{ step }}</li>
+            <li v-for="step in topic.answerOutline" :key="step"><RichText :text="step" /></li>
           </ol>
-          <p class="mt-4 text-sm text-slate-600"><span class="font-semibold">Типичная ошибка:</span> {{ topic.pitfalls[0] }}</p>
+          <div class="mt-4 text-sm text-slate-600"><span class="font-semibold">Типичная ошибка:</span> <RichText :text="topic.pitfalls[0]" /></div>
         </div>
       </div>
     </section>

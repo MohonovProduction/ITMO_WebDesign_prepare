@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { TRACKS } from '@/data/tracks'
 import { webTheory } from '@/data/webTheory'
+import RichText from '@/components/RichText.vue'
 
 const route = useRoute()
 const activeTrack = ref(route.query.track || 'tech')
@@ -66,16 +67,16 @@ watch(() => route.query.track, (track) => {
               </span>
             </div>
             <template v-if="topic.status === 'ready'">
-              <p class="mt-3 text-sm leading-relaxed text-slate-700">{{ topic.definition }}</p>
-              <p class="mt-2 text-sm text-slate-500"><span class="font-semibold text-slate-600">Зачем учить:</span> {{ topic.why }}</p>
+              <div class="mt-3 text-sm leading-relaxed text-slate-700"><RichText :text="topic.definition" /></div>
+              <div class="mt-2 text-sm text-slate-500"><span class="font-semibold text-slate-600">Зачем учить:</span> <RichText :text="topic.why" /></div>
               <details class="mt-4 rounded-xl bg-slate-50 p-4">
                 <summary class="cursor-pointer font-semibold text-slate-700">Открыть структуру ответа на билет</summary>
                 <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
-                  <li v-for="step in topic.answerOutline" :key="step">{{ step }}</li>
+                  <li v-for="step in topic.answerOutline" :key="step"><RichText :text="step" /></li>
                 </ol>
                 <h3 class="mt-4 text-sm font-semibold text-slate-700">Типичные ошибки</h3>
                 <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
-                  <li v-for="pitfall in topic.pitfalls" :key="pitfall">{{ pitfall }}</li>
+                  <li v-for="pitfall in topic.pitfalls" :key="pitfall"><RichText :text="pitfall" /></li>
                 </ul>
               </details>
             </template>
