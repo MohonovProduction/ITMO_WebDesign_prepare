@@ -34,6 +34,8 @@ const routes = [
     component: () => import('@/views/SemanticsView.vue'),
     meta: { title: 'Семантика HTML' },
   },
+  { path: '/css', name: 'css', component: () => import('@/views/CssReferenceView.vue'), meta: { title: 'CSS' } },
+  { path: '/svg', name: 'svg', component: () => import('@/views/SvgReferenceView.vue'), meta: { title: 'SVG' } },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 

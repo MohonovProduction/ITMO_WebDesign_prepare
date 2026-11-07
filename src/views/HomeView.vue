@@ -61,6 +61,11 @@ import { topicsByTrack } from '@/data/webTheory'
       </div>
     </RouterLink>
 
+    <div class="grid gap-4 sm:grid-cols-2">
+      <RouterLink to="/css" class="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md"><div class="emoji flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-2xl">🎨</div><div><h2 class="font-bold text-slate-900">Справочник CSS</h2><p class="text-sm text-slate-500">Селекторы, шрифты, раскладка, состояния и адаптив.</p></div></RouterLink>
+      <RouterLink to="/svg" class="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md"><div class="emoji flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-2xl">✒️</div><div><h2 class="font-bold text-slate-900">Справочник SVG</h2><p class="text-sm text-slate-500">Интерактивная схема и элементы векторной графики.</p></div></RouterLink>
+    </div>
+
     <section class="card p-5">
       <h2 class="text-lg font-bold text-slate-900">Как будет устроена подготовка</h2>
       <p class="mt-2 max-w-2xl text-sm text-slate-600">

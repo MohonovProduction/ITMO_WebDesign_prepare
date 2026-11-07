@@ -57,7 +57,7 @@ watch(activeDeck, () => { index.value = 0; flipped.value = false })
       <p class="text-slate-500">Термин → объяснение → связь с экзаменационным вопросом. Отмечайте то, что нужно повторить.</p>
     </header>
 
-    <div class="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-3 sm:overflow-visible">
+    <div class="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-4 sm:overflow-visible">
       <button v-for="deck in WEB_DECKS" :key="deck.id" class="flex min-w-[9rem] flex-none flex-col items-center gap-0.5 rounded-xl px-3 py-3 text-center transition sm:min-w-0" :class="activeDeck === deck.id ? 'bg-brand-gradient text-slate-800 shadow-sm' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'" @click="selectDeck(deck.id)">
         <span class="emoji text-xl">{{ deck.icon }}</span>
         <span class="text-sm font-semibold">{{ deck.title }}</span>
