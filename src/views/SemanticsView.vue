@@ -2,8 +2,11 @@
 import { computed, ref } from 'vue'
 import { semanticCodeLines, semanticTags, tagCategoryStyles } from '@/data/semanticTags'
 import DisclosureCard from '@/components/DisclosureCard.vue'
+import FormsLab from '@/components/FormsLab.vue'
+import ChoiceChips from '@/components/ChoiceChips.vue'
 import RichText from '@/components/RichText.vue'
 
+const section = ref('structure')
 const activeTag = ref(null)
 const openTag = ref(null)
 const selected = computed(() => semanticTags.find((item) => item.tag === activeTag.value) || null)
@@ -32,6 +35,9 @@ function isRelated(item) {
       <p class="mt-1 max-w-3xl text-slate-500">Откройте карточку тега — он и путь к нему подсветятся в дереве страницы. Цвет отражает группу, как в IDE.</p>
     </header>
 
+    <ChoiceChips v-model="section" :options="[{ id: 'structure', label: 'Структура страницы' }, { id: 'forms', label: 'Формы и input' }]" label="Разделы HTML" />
+    <FormsLab v-if="section === 'forms'" />
+    <template v-else>
     <div v-if="selected" class="sticky top-20 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lg">
       <span><code class="font-mono text-brand-100">&lt;{{ selected.tag }}&gt;</code><span class="mx-2 text-slate-500">·</span><span class="font-mono text-slate-200">{{ selected.path.join(' > ') }}</span></span>
       <button type="button" class="rounded-lg bg-white/10 px-3 py-1.5 font-semibold text-white hover:bg-white/20" @click="clearSelection">Снять выделение</button>
@@ -66,5 +72,6 @@ function isRelated(item) {
         <a class="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-brand-700 hover:underline" :href="item.mdn" target="_blank" rel="noreferrer">Подробнее на MDN Web Docs ↗</a>
       </DisclosureCard>
     </section>
+    </template>
   </div>
 </template>

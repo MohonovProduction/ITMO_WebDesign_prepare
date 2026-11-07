@@ -1,8 +1,10 @@
+import { expandedConcepts } from './expandedConcepts.js'
 // Единственный источник определений. ID учебных карточек остаются стабильными.
 function concept(id, deck, question, definition, examRefs) {
   return { id, deck, question, definition, examRefs }
 }
 const studyConcepts = [
+  ...expandedConcepts,
   concept('css-selectors', 'css', 'Что делает CSS-селектор?', 'Селектор выбирает HTML-элементы, к которым применяется правило. Например, `article p` выбирает абзацы внутри статьи, а `.lead` — элементы с классом `lead`.', ['tech-3', 'tech-5']),
   concept('css-class-id', 'css', 'Чем класс отличается от `id`?', 'Класс переиспользуется на нескольких элементах и подходит для стилизации группы. `id` должен быть уникален в документе; его удобно применять для якоря или связи с `label`.', ['tech-3', 'tech-5']),
   concept('css-font', 'css', 'Зачем у `font-family` нужен fallback?', 'Если основной шрифт не загрузился или не поддерживает символ, браузер возьмёт следующий вариант. В конце указывают обобщённое семейство, например `sans-serif`.', ['tech-5']),

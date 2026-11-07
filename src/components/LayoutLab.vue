@@ -111,6 +111,6 @@ label { display:flex; flex-direction:column; gap:6px; font-size:14px; color:#475
 .column-sample { flex:0 0 auto; }
 h2 { margin:8px 0 4px; font-weight:700; font-size:14px; }
 .sample p { max-width:126px; font-size:12px; line-height:1.5; color:#64748b; }
-.placeholder { display:flex; align-items:center; justify-content:center; background:linear-gradient(120deg,#cfbaf0,#98f5e1); border-radius:6px; font-size:22px; color:#334155; }
+.placeholder { display:flex; align-items:center; justify-content:center; background:var(--study-gradient); border-radius:6px; font-size:22px; color:#334155; }
 @media(max-width:639px) { .row-sample { width:68px; padding:7px; }.sample p { font-size:11px; }.sample h2 { font-size:11px; overflow-wrap:anywhere; }.controls { grid-template-columns:1fr; } select { font-size:16px; min-height:44px; } }
 </style>

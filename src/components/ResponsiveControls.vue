@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
-defineProps({ title: { type: String, default: 'Настройки сцены' } })
+defineProps({ title: { type: String, default: 'Настройки сцены' }, triggerLabel: { type: String, default: 'Настроить сцену' } })
 const mobile = ref(false)
 const dialog = ref(null)
 const opened = ref(false)
@@ -28,7 +28,7 @@ onBeforeUnmount(() => { query?.removeEventListener('change', sync); dialog.value
   <div v-if="!mobile"><slot /></div>
   <template v-else>
     <Teleport to="body">
-      <button class="sheet-trigger" type="button" :aria-expanded="opened" @click="open">Настроить сцену <span aria-hidden="true">☷</span></button>
+      <button class="sheet-trigger" type="button" :aria-expanded="opened" @click="open">{{ triggerLabel }} <span aria-hidden="true">☷</span></button>
       <dialog ref="dialog" class="control-sheet" aria-label="Настройки учебной сцены" @cancel.prevent="close" @close="opened = false" @click="event => { if (event.target === dialog) close() }">
         <div class="sheet-content">
           <div class="sheet-heading"><h2>{{ title }}</h2><button type="button" aria-label="Закрыть настройки" @click="close">Готово</button></div>

@@ -44,7 +44,7 @@ function select(next) { unit.value = next; value.value = next === 'px' ? 160 : n
 .ruler{width:300px;display:flex;justify-content:space-between;border-bottom:1px solid #64748b;background:repeating-linear-gradient(90deg,#94a3b8 0 1px,transparent 1px 10px) bottom/100% 6px no-repeat;padding-bottom:10px;font:11px monospace;color:#64748b}
 .parent{width:300px;height:90px;margin-top:12px;border:1px dashed #64748b;background:#f1f5f9;box-sizing:content-box}
 .parent.percent{background:repeating-linear-gradient(90deg,#e2e8f0 0 1px,transparent 1px 30px),#f1f5f9}
-.measured{height:90px;background:linear-gradient(120deg,#cfbaf0,#98f5e1);transition:width 200ms ease-out}
+.measured{height:90px;background:var(--study-gradient);transition:width 200ms ease-out}
 .grid-demo{display:grid;gap:12px;min-height:140px;transition:grid-template-columns 250ms ease-out}
 .grid-cell{border:1px dashed #64748b;padding:6px;background:repeating-linear-gradient(90deg,#e2e8f0 0 1px,transparent 1px 20px),#f8fafc;min-width:0}
 .fill{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;background:#cfc6ed;color:#334155;font:14px monospace}.fill.muted{background:#a3e5d7}

@@ -1,81 +1,50 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
-
 const route = useRoute()
 const open = ref(false)
-const referencesOpen = ref(false)
-const references = [
-  { to: '/semantics', label: 'HTML — семантика' },
-  { to: '/css', label: 'CSS — лаборатории' },
-  { to: '/svg', label: 'SVG — графика' },
+const activeGroup = ref(null)
+const header = ref(null)
+const groups = [
+  { id:'learn', label:'Учиться', text:'Понять и связать темы', links:[
+    {to:'/theory',label:'Теория',description:'Два блока экзамена'},
+    {to:'/tracks',label:'Карта экзамена',description:'Вопросы и структура подготовки'},
+  ]},
+  { id:'practice',label:'Повторять',text:'Закрепить и проверить',links:[
+    {to:'/flashcards',label:'Карточки и дерево тем',description:'Повторение незнакомого'},
+    {to:'/practice',label:'Билет',description:'Устный ответ и самопроверка'},
+  ]},
+  { id:'references',label:'Справочники',text:'Попробовать на практике',links:[
+    {to:'/semantics',label:'HTML',description:'Структура, формы и input'},
+    {to:'/css',label:'CSS',description:'Основы, box model и раскладка'},
+    {to:'/svg',label:'SVG',description:'Фигуры и интерактивные схемы'},
+  ]},
 ]
-watch(() => route.path, () => { open.value = false; referencesOpen.value = false })
-
-const links = [
-  { to: '/', label: 'Главная', icon: 'home' },
-  { to: '/tracks', label: 'Карта экзамена', icon: 'account_tree' },
-  { to: '/theory', label: 'Темы', icon: 'menu_book' },
-  { to: '/flashcards', label: 'Карточки', icon: 'style' },
-  { to: '/practice', label: 'Билет', icon: 'school' },
-]
-
-function isActive(to) {
-  if (to === '/') return route.path === '/'
-  return route.path.startsWith(to)
-}
+function selected(group) { return group.links.some(item=>item.to === route.path) }
+function close() { activeGroup.value=null; open.value=false }
+function outside(event) { if (!header.value?.contains(event.target)) close() }
+watch(()=>route.path, close)
+onMounted(()=>document.addEventListener('pointerdown',outside))
+onBeforeUnmount(()=>document.removeEventListener('pointerdown',outside))
 </script>
-
 <template>
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-white focus:p-4">Перейти к содержимому</a>
-  <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur" @keydown.esc="open = false; referencesOpen = false">
-    <div class="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-      <RouterLink to="/" class="flex items-center gap-2 font-extrabold">
-        <span class="material-symbols-rounded text-gradient" style="font-size: 1.6rem">web</span>
-        <span class="text-gradient hidden sm:inline">Веб-проектирование · Господин БаллОвский</span>
-        <span class="text-gradient sm:hidden">Веб-проектирование</span>
-      </RouterLink>
-
-      <nav aria-label="Основная навигация" class="hidden items-center gap-1 xl:flex">
-        <RouterLink
-          v-for="l in links"
-          :key="l.to"
-          :to="l.to"
-          class="link-gradient flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium"
-          :class="isActive(l.to) ? 'is-active text-slate-900' : 'text-slate-600'"
-        >
-          <span class="material-symbols-rounded" style="font-size: 1.1rem">{{ l.icon }}</span>
-          {{ l.label }}
-        </RouterLink>
-        <div class="relative" @focusout="event => { if (!event.currentTarget.contains(event.relatedTarget)) referencesOpen = false }">
-          <button type="button" :aria-expanded="referencesOpen" aria-controls="desktop-references" class="min-h-11 rounded-lg px-2 text-sm font-medium text-slate-600" @click="referencesOpen = !referencesOpen">Справочники ▾</button>
-          <Transition name="navigation"><div v-show="referencesOpen" id="desktop-references" class="absolute right-0 top-full mt-2 w-56 rounded-xl bg-white p-2 shadow-lg ring-1 ring-slate-200">
-            <RouterLink v-for="item in references" :key="item.to" :to="item.to" :aria-current="route.path === item.to ? 'page' : undefined" class="block rounded-lg px-3 py-3 text-sm text-slate-700 hover:bg-slate-50">{{ item.label }}</RouterLink>
-          </div></Transition>
+  <header ref="header" class="app-header" @keydown.esc="close" @focusout="event=>{ if (!event.currentTarget.contains(event.relatedTarget)) close() }">
+    <div class="header-row">
+      <RouterLink to="/" class="brand" aria-label="Веб-проектирование — главная"><span class="brand-icon material-symbols-rounded" aria-hidden="true">web</span><span><strong>Веб-проектирование</strong><small>Господин БаллОвский · ИТМО</small></span></RouterLink>
+      <nav class="desktop-nav" aria-label="Основная навигация">
+        <RouterLink to="/" class="home-link" :aria-current="route.path === '/' ? 'page' : undefined"><span class="material-symbols-rounded" aria-hidden="true">home</span><span class="sr-only">Главная</span></RouterLink>
+        <div v-for="group in groups" :key="group.id" class="nav-group">
+          <button type="button" :aria-expanded="activeGroup === group.id" :aria-controls="'nav-' + group.id" class="group-trigger" :class="{selected:selected(group)}" @click="activeGroup = activeGroup === group.id ? null : group.id">{{ group.label }}<span aria-hidden="true" :class="{'rotate-180':activeGroup === group.id}" class="material-symbols-rounded transition-transform">expand_more</span></button>
+          <Transition name="nav-panel"><div v-show="activeGroup === group.id" :id="'nav-' + group.id" class="nav-panel"><p>{{ group.text }}</p><RouterLink v-for="link in group.links" :key="link.to" :to="link.to" :aria-current="route.path === link.to ? 'page' : undefined"><strong>{{ link.label }}</strong><small>{{ link.description }}</small></RouterLink></div></Transition>
         </div>
       </nav>
-
-      <button type="button" class="btn-secondary !px-3 xl:hidden" aria-label="Меню" :aria-expanded="open" aria-controls="mobile-navigation" @click="open = !open">
-        <span class="material-symbols-rounded">{{ open ? 'close' : 'menu' }}</span>
-      </button>
+      <button type="button" class="btn-secondary mobile-trigger" :aria-expanded="open" aria-controls="mobile-navigation" @click="open = !open"><span aria-hidden="true" class="material-symbols-rounded">{{ open?'close':'menu' }}</span><span class="sr-only">Меню</span></button>
     </div>
-
-    <Transition name="navigation"><nav v-show="open" id="mobile-navigation" aria-label="Мобильная навигация" class="max-h-[75dvh] overflow-y-auto border-t border-slate-100 bg-white px-4 py-2 xl:hidden">
-      <RouterLink
-        v-for="l in links"
-        :key="l.to"
-        :to="l.to"
-        class="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium"
-        @click="open = false"
-      >
-        {{ l.label }}
-      </RouterLink>
-      <p class="px-3 pt-3 text-sm font-semibold text-slate-500">Справочники</p>
-      <RouterLink v-for="item in references" :key="item.to" :to="item.to" :aria-current="route.path === item.to ? 'page' : undefined" class="block rounded-lg px-3 py-3 text-sm text-slate-700" @click="open = false">{{ item.label }}</RouterLink>
-    </nav></Transition>
+    <Transition name="nav-panel"><nav v-show="open" id="mobile-navigation" class="mobile-nav" aria-label="Мобильная навигация"><RouterLink to="/" class="block px-3 py-3">Главная</RouterLink><section v-for="group in groups" :key="group.id"><h2>{{ group.label }}</h2><RouterLink v-for="link in group.links" :key="link.to" :to="link.to" :aria-current="route.path === link.to ? 'page' : undefined">{{ link.label }}</RouterLink></section></nav></Transition>
   </header>
 </template>
-
 <style scoped>
-.navigation-enter-active,.navigation-leave-active{transition:opacity 150ms ease,transform 150ms ease}.navigation-enter-from,.navigation-leave-to{opacity:0;transform:translateY(-4px)}
+.app-header{position:sticky;top:0;z-index:20;background:#f7f9ffed;backdrop-filter:blur(18px);border-bottom:1px solid #a4afe84d}.header-row{max-width:1280px;margin:auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{display:flex;align-items:center;gap:12px;color:var(--palette-ink)}.brand strong{display:block;font-size:17px}.brand small{display:block;font-size:11px;letter-spacing:.04em;color:#64748b}.brand-icon{padding:10px;border-radius:12px;background:var(--study-gradient);font-size:24px}.desktop-nav{display:flex;align-items:center;gap:8px}.home-link{padding:10px;display:flex;border-radius:12px}.home-link[aria-current=page]{background:#e2e9f7}.nav-group{position:relative}.group-trigger{display:flex;gap:8px;align-items:center;min-height:44px;padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;color:#475569;transition:background 160ms}.group-trigger:hover,.group-trigger.selected{background:#dfe7f4;color:#35485a}.nav-panel{position:absolute;right:0;top:calc(100% + 12px);width:290px;padding:12px;background:#fffffff5;border-radius:18px;box-shadow:0 12px 40px #35485a24;border:1px solid #cbd7f1}.nav-panel>p{font-size:12px;color:#64748b;padding:8px 12px}.nav-panel a{display:block;padding:12px;border-radius:12px;transition:background 160ms}.nav-panel a:hover,.nav-panel a[aria-current=page]{background:#edf2fa}.nav-panel strong{font-size:14px;font-weight:600}.nav-panel small{display:block;font-size:12px;color:#64748b;margin-top:2px}.mobile-trigger,.mobile-nav{display:none}.nav-panel-enter-active,.nav-panel-leave-active{transition:opacity 160ms,transform 160ms}.nav-panel-enter-from,.nav-panel-leave-to{opacity:0;transform:translateY(-6px)}
+@media(max-width:767px){.header-row{padding:10px 16px;gap:12px}.brand strong{font-size:14px}.brand small{font-size:10px}.desktop-nav{display:none}.mobile-trigger{display:flex}.mobile-nav{display:block;max-height:75dvh;overflow:auto;padding:8px 16px 16px;background:#f7f9ff}.mobile-nav section{margin-top:12px}.mobile-nav h2{padding:6px 12px;color:#64748b;font-size:12px}.mobile-nav section a{display:block;padding:12px;border-radius:10px;font-size:14px}.mobile-nav a[aria-current=page]{background:#dfe7f4}}
 </style>

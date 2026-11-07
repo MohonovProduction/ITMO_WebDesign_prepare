@@ -8,13 +8,13 @@ import { topicsByTrack } from '@/data/webTheory'
     <section class="card overflow-hidden">
       <div
         class="p-6 text-slate-800 sm:p-8"
-        style="background-image: linear-gradient(120deg, #fbf8cc 0%, #ffcfd2 22%, #f1c0e8 42%, #cfbaf0 60%, #a3c4f3 78%, #98f5e1 100%)"
+        style="background-image: var(--study-gradient)"
       >
         <p class="text-sm font-bold uppercase tracking-[0.16em] text-slate-600">ИТМО · 2 семестр</p>
         <h1 class="mt-2 text-2xl font-extrabold sm:text-3xl">Веб-проектирование · подготовка к экзамену</h1>
         <p class="mt-1 max-w-xl text-slate-700">
-          Два преподавательских блока, связанные темы и будущий режим устного ответа.
-          Сейчас собран навигационный каркас и карта всех экзаменационных вопросов.
+          Два экзаменационных блока, карточки с деревом тем и интерактивные лаборатории.
+          Изучайте понятия на примерах и проверяйте себя в тренировке билетов.
         </p>
       </div>
     </section>
@@ -67,10 +67,10 @@ import { topicsByTrack } from '@/data/webTheory'
     </div>
 
     <section class="card p-5">
-      <h2 class="text-lg font-bold text-slate-900">Как будет устроена подготовка</h2>
+      <h2 class="text-lg font-bold text-slate-900">От темы — к уверенному ответу</h2>
       <p class="mt-2 max-w-2xl text-sm text-slate-600">
-        Каждая тема получит конспект, структуру устного ответа, связи с другим блоком и тренировку ошибок.
-        Это позволит учить не разрозненные определения, а полный ход рассуждения.
+        Прочитайте конспект, попробуйте интерактивный пример и закрепите определение карточками.
+        Затем проговорите ответ на билет и оцените каждый вопрос отдельно.
       </p>
       <RouterLink to="/tracks" class="btn-secondary mt-4">Посмотреть карту экзамена →</RouterLink>
     </section>

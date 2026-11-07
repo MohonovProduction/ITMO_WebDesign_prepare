@@ -4,6 +4,12 @@
 
 :root {
   color-scheme: light;
+  --palette-sky: #b5d4e9;
+  --palette-periwinkle: #a4afe8;
+  --palette-mint: #bcebd9;
+  --palette-aqua: #afe2df;
+  --palette-ink: #35485a;
+  --study-gradient: linear-gradient(120deg, var(--palette-sky), var(--palette-periwinkle) 40%, var(--palette-mint) 75%, var(--palette-aqua));
 }
 
 :where(button, a, input, select, summary, [tabindex]):focus-visible {
@@ -30,15 +36,20 @@ body {
 body {
   @apply text-slate-800 antialiased;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, 'Noto Color Emoji', sans-serif;
-  background-color: #f7f9fc;
-  /* Едва заметный орнамент (статистический мотив) поверх мягкого пастельного градиента */
-  background-image:
-    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='84'%20height='84'%20viewBox='0%200%2084%2084'%3E%3Cg%20fill='none'%20stroke='%23475569'%20stroke-width='1.2'%20stroke-linecap='round'%20opacity='0.06'%3E%3Cpath%20d='M6%2056%20q12%20-30%2024%200'/%3E%3Ccircle%20cx='62'%20cy='22'%20r='3'/%3E%3Cpath%20d='M54%2060%20h12%20M60%2054%20v12'/%3E%3Cpath%20d='M10%2016%20h16'/%3E%3Ccircle%20cx='20'%20cy='70'%20r='1.6'/%3E%3Cpath%20d='M70%2068%20q-8%20-10%20-16%200'/%3E%3C/g%3E%3C/svg%3E"),
-    radial-gradient(circle at 0% 0%, rgba(251, 248, 204, 0.55), transparent 42%),
-    radial-gradient(circle at 100% 0%, rgba(241, 192, 232, 0.5), transparent 42%),
-    radial-gradient(circle at 100% 100%, rgba(152, 245, 225, 0.5), transparent 42%),
-    radial-gradient(circle at 0% 100%, rgba(163, 196, 243, 0.5), transparent 42%);
-  background-attachment: fixed;
+  isolation: isolate;
+  background-color: #b2b1ee;
+  background-image: linear-gradient(135deg, #b5d4e9b3, #b2b1ee66 48%, #afe2df99);
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: #6876a6;
+  opacity: .5;
+  -webkit-mask: url('/telegram-pattern.svg') repeat top left / 720px auto;
+  mask: url('/telegram-pattern.svg') repeat top left / 720px auto;
 }
 
 #app {
@@ -81,19 +92,10 @@ body {
   }
   /* Пастельный «брендовый» градиент для заливок с подложкой (на нём — тёмный текст). */
   .bg-brand-gradient {
-    background-image: linear-gradient(
-      120deg,
-      rgb(251, 248, 204) 0%,
-      rgb(255, 207, 210) 22%,
-      rgb(241, 192, 232) 42%,
-      rgb(207, 186, 240) 60%,
-      rgb(163, 196, 243) 78%,
-      rgb(152, 245, 225) 100%
-    );
-  }
+    background-image: var(--study-gradient);  }
   /* Насыщенный градиент для градиентного ТЕКСТА (читаем на белом). */
   .text-gradient {
-    background-image: linear-gradient(90deg, #8ca2f1,#b293db,#f396c9,#fac53f,#f23e42);
+    background-image: linear-gradient(90deg, #425a83, #5661a2, #346b68);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -111,14 +113,7 @@ body {
     bottom: 0.3rem;
     height: 2px;
     border-radius: 2px;
-    background-image: linear-gradient(
-      90deg,
-      hsla(332, 100%, 61%, 1) 0%,
-      hsla(200, 100%, 56%, 1) 32%,
-      hsla(143, 100%, 61%, 1) 65%,
-      hsla(265, 100%, 69%, 1) 100%
-    );
-    transform: scaleX(0);
+    background-image: linear-gradient(90deg, #7584c9, #4e948b);    transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.22s ease;
   }
@@ -131,17 +126,17 @@ body {
   }
   .btn-success {
     @apply btn text-white;
-    background-color: #57b98a;
+    background-color: #387b68;
   }
   .btn-success:hover {
-    background-color: #4aa87b;
+    background-color: #2e6958;
   }
   .btn-danger {
     @apply btn text-white;
-    background-color: #e7788f;
+    background-color: #7867a8;
   }
   .btn-danger:hover {
-    background-color: #de647e;
+    background-color: #65548f;
   }
   .card {
     @apply rounded-2xl bg-white/95 shadow-sm ring-1 ring-slate-100 backdrop-blur-sm;

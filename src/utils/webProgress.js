@@ -4,7 +4,7 @@ export function sanitizeProgress(value) {
   const data = object(value) ? value : {}
   return {
     version: 1,
-    cardSession: object(data.cardSession) && typeof data.cardSession.deck === 'string' ? { deck: data.cardSession.deck, cardId: typeof data.cardSession.cardId === 'string' ? data.cardSession.cardId : null, filter: ['all', 'unknown', 'new'].includes(data.cardSession.filter) ? data.cardSession.filter : 'all' } : null,
+    cardSession: object(data.cardSession) && typeof data.cardSession.deck === 'string' ? { deck: data.cardSession.deck, ...(typeof data.cardSession.topicId === 'string' ? { topicId: data.cardSession.topicId } : {}), cardId: typeof data.cardSession.cardId === 'string' ? data.cardSession.cardId : null, filter: ['all', 'unknown', 'new'].includes(data.cardSession.filter) ? data.cardSession.filter : 'all' } : null,
     marks: object(data.marks) ? Object.fromEntries(Object.entries(data.marks).filter(([id, status]) => id && ['known', 'unknown'].includes(status))) : {},
     attempts: Array.isArray(data.attempts) ? data.attempts.filter(item => object(item) && typeof item.id === 'string' && Number.isFinite(item.at) && Number.isFinite(item.score) && item.score >= 0 && item.score <= 4 && Array.isArray(item.topics) && item.topics.length > 0 && item.topics.every(id => typeof id === 'string')).filter((item, i, list) => list.findIndex(other => other.id === item.id) === i) : [],
     prepDays: Array.isArray(data.prepDays) ? [...new Set(data.prepDays.filter(day => typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day)))] : [],
