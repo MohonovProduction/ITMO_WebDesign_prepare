@@ -1,11 +1,23 @@
-@import 'katex/dist/katex.min.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   color-scheme: light;
+}
+
+:where(button, a, input, select, summary, [tabindex]):focus-visible {
+  outline: 3px solid #0369a1;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 html,
@@ -146,11 +158,6 @@ body {
   line-height: 1;
 }
 
-/* Сдержанный размер формул KaTeX внутри потока текста */
-.katex {
-  font-size: 1.05em;
-}
-
 /* Анимация переворота карточки */
 .flip-card {
   perspective: 1600px;
@@ -171,72 +178,6 @@ body {
 }
 
 @media print {
-  header, footer, nav { display: none !important; }
-  main { max-width: 100% !important; padding: 0 !important; }
-  .cheatsheet-print > *:not(.cheatsheet-print-root) { display: none !important; }
-  body.printing-cheatsheet-compact .cheatsheet-print-root,
-  body.printing-cheatsheet-full .cheatsheet-print-root { display: block !important; }
-}
-
-@page cheatsheet-compact {
-  size: A4 landscape;
-  margin: 6mm;
-}
-
-body.printing-cheatsheet-compact .cheatsheet-compact-print {
-  page: cheatsheet-compact;
-  font-size: 7pt;
-  line-height: 1.2;
-  color: #0f172a;
-}
-
-body.printing-cheatsheet-compact .cheatsheet-print-table,
-body.printing-cheatsheet-full .cheatsheet-print-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-body.printing-cheatsheet-compact .cheatsheet-print-th,
-body.printing-cheatsheet-compact .cheatsheet-print-td {
-  border: 0.5pt solid #e2e8f0;
-  padding: 1mm 1.5mm;
-  vertical-align: top;
-  font-size: 6.5pt;
-}
-
-body.printing-cheatsheet-compact .cheatsheet-print-th {
-  background: #f1f5f9;
-  font-weight: 600;
-}
-
-body.printing-cheatsheet-compact .cheatsheet-print-row {
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-
-body.printing-cheatsheet-full .cheatsheet-full-print {
-  font-size: 8pt;
-}
-
-body.printing-cheatsheet-full .cheatsheet-print-th,
-body.printing-cheatsheet-full .cheatsheet-print-td {
-  border: 0.5pt solid #e2e8f0;
-  padding: 1.5mm 2mm;
-  vertical-align: top;
-  font-size: 7.5pt;
-}
-
-body.printing-cheatsheet-full .cheatsheet-print-th {
-  background: #f1f5f9;
-  font-weight: 600;
-}
-
-body.printing-cheatsheet-full .cheatsheet-print-row {
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-
-body.printing-cheatsheet-full .cheatsheet-print-mnemonic {
-  font-style: italic;
-  font-size: 7pt;
+  body { background: white; }
+  #main-content { max-width:100%; padding:0; }
 }

@@ -3,13 +3,16 @@ import { computed, ref } from 'vue'
 import { webTheory } from '@/data/webTheory'
 import { TRACKS } from '@/data/tracks'
 import RichText from '@/components/RichText.vue'
+import { useWebProgressStore } from '@/store/webProgress'
 
-const STORAGE_KEY = 'webdesign_practice_v1'
+const store = useWebProgressStore()
+const attemptId = ref(crypto.randomUUID())
+const saved = ref(false)
 const mode = ref('mixed')
 const singleTrack = ref('tech')
-const revealed = ref(false)
-const ratings = ref({ terminology: false, logic: false, example: false, relation: false })
-const history = ref(loadHistory())
+const revealed = ref({})
+const ratings = ref({})
+const history = computed(() => store.attempts)
 const ticket = ref(makeTicket())
 
 const readyTopics = computed(() => webTheory.filter((topic) => topic.status === 'ready'))
@@ -19,10 +22,6 @@ const criteria = [
   { id: 'example', title: 'Пример', text: 'Привёл уместный пример, сценарий или практическое следствие.' },
   { id: 'relation', title: 'Связи', text: 'Связал тему с продуктом, пользователем или соседними вопросами.' },
 ]
-
-function loadHistory() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [] } catch { return [] }
-}
 
 function randomTopic(trackId) {
   const list = readyTopics.value.filter((topic) => topic.trackId === trackId)
@@ -40,26 +39,32 @@ function makeTicket() {
 
 function newTicket() {
   ticket.value = makeTicket()
-  revealed.value = false
-  ratings.value = { terminology: false, logic: false, example: false, relation: false }
+  revealed.value = {}
+  attemptId.value = crypto.randomUUID()
+  saved.value = false
+  ratings.value = {}
 }
 
-function toggleRating(id) {
-  ratings.value = { ...ratings.value, [id]: !ratings.value[id] }
+function toggleRating(topicId, criterionId) {
+  if (saved.value) return
+  ratings.value = { ...ratings.value, [topicId]: { ...ratings.value[topicId], [criterionId]: !ratings.value[topicId]?.[criterionId] } }
 }
 
-const score = computed(() => Object.values(ratings.value).filter(Boolean).length)
+function topicScore(id) { return criteria.filter(criterion => ratings.value[id]?.[criterion.id]).length }
+const score = computed(() => ticket.value.reduce((sum, topic) => sum + topicScore(topic.id), 0) / ticket.value.length)
 const attempts = computed(() => history.value.length)
 const average = computed(() => attempts.value ? Math.round((history.value.reduce((sum, item) => sum + item.score, 0) / attempts.value) * 25) : 0)
 
 function saveAttempt() {
+  if (saved.value) return
   const item = {
+    id: attemptId.value,
     at: Date.now(),
     score: score.value,
     topics: ticket.value.map((topic) => topic.id),
+    topicScores: ticket.value.map(topic => ({ topicId: topic.id, score: topicScore(topic.id), criteria: { ...ratings.value[topic.id] } })),
   }
-  history.value = [item, ...history.value].slice(0, 20)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history.value))
+  saved.value = store.saveAttempt(item)
 }
 
 function trackTitle(id) { return TRACKS.find((track) => track.id === id)?.shortTitle || id }
@@ -96,9 +101,9 @@ function trackTitle(id) { return TRACKS.find((track) => track.id === id)?.shortT
       <div class="p-5">
         <h2 class="text-xl font-extrabold leading-snug text-slate-900">{{ topic.number }}. {{ topic.title }}</h2>
         <p class="mt-3 text-sm text-slate-500">Постарайтесь назвать определение, объяснить процесс, привести пример и связать тему с продуктом.</p>
-        <button class="btn-secondary mt-5" @click="revealed = !revealed">{{ revealed ? 'Скрыть опорный план' : 'Открыть опорный план' }}</button>
+        <button class="btn-secondary mt-5" :aria-expanded="Boolean(revealed[topic.id])" @click="revealed[topic.id] = !revealed[topic.id]">{{ revealed[topic.id] ? 'Скрыть опорный план' : 'Открыть опорный план' }}</button>
 
-        <div v-if="revealed" class="mt-5 rounded-xl bg-brand-50 p-4">
+        <div v-if="revealed[topic.id]" class="mt-5 rounded-xl bg-brand-50 p-4">
           <p class="font-semibold text-slate-800">Ключевая мысль</p>
           <div class="mt-1 text-sm leading-relaxed text-slate-700"><RichText :text="topic.definition" /></div>
           <ol class="mt-4 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
@@ -110,18 +115,23 @@ function trackTitle(id) { return TRACKS.find((track) => track.id === id)?.shortT
     </section>
 
     <section class="card p-5">
-      <h2 class="text-lg font-extrabold text-slate-900">Самопроверка</h2>
-      <p class="mt-1 text-sm text-slate-500">Оцените ответ целиком: в смешанном билете — оба вопроса.</p>
-      <div class="mt-4 grid gap-3 sm:grid-cols-2">
-        <button v-for="criterion in criteria" :key="criterion.id" class="rounded-xl border p-4 text-left transition" :class="ratings[criterion.id] ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white hover:bg-slate-50'" @click="toggleRating(criterion.id)">
-          <span class="font-semibold text-slate-800">{{ ratings[criterion.id] ? '✓ ' : '' }}{{ criterion.title }}</span>
-          <span class="mt-1 block text-sm text-slate-500">{{ criterion.text }}</span>
-        </button>
+      <h2 class="text-lg font-extrabold text-slate-900">Самопроверка по каждому вопросу</h2>
+      <p class="mt-1 text-sm text-slate-500">Отмечайте критерии отдельно: сильный ответ в одном блоке не должен скрывать пробелы в другом.</p>
+      <div v-for="topic in ticket" :key="topic.id" class="mt-5 border-t border-slate-100 pt-4">
+        <h3 class="font-semibold text-slate-800">{{ trackTitle(topic.trackId) }} · {{ topic.title }}</h3>
+        <div class="mt-3 grid gap-3 sm:grid-cols-2">
+          <button v-for="criterion in criteria" :key="criterion.id" :disabled="saved" :aria-pressed="Boolean(ratings[topic.id]?.[criterion.id])" class="rounded-xl border p-4 text-left transition-colors" :class="ratings[topic.id]?.[criterion.id] ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white hover:bg-slate-50'" @click="toggleRating(topic.id, criterion.id)">
+            <span class="font-semibold text-slate-800">{{ ratings[topic.id]?.[criterion.id] ? '✓ ' : '' }}{{ criterion.title }}</span>
+            <span class="mt-1 block text-sm text-slate-500">{{ criterion.text }}</span>
+          </button>
+        </div>
+        <p class="mt-3 text-sm font-semibold text-slate-600">Этот вопрос: {{ topicScore(topic.id) }} / 4</p>
       </div>
       <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
-        <p class="font-semibold text-slate-700">Результат: {{ score }} / {{ criteria.length }}</p>
-        <button class="btn-primary" @click="saveAttempt">Сохранить попытку</button>
+        <p class="font-semibold text-slate-700">Средний результат билета: {{ score }} / 4</p>
+        <button class="btn-primary" :disabled="saved" @click="saveAttempt">{{ saved ? 'Попытка сохранена' : 'Сохранить попытку' }}</button>
       </div>
+      <p v-if="saved" role="status" class="mt-3 text-sm text-emerald-700">Оценки обоих блоков сохранены. Можно взять новый билет.</p>
     </section>
   </div>
 </template>

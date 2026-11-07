@@ -1,6 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { semanticCodeLines, semanticTags, tagCategoryStyles } from '@/data/semanticTags'
+import DisclosureCard from '@/components/DisclosureCard.vue'
+import RichText from '@/components/RichText.vue'
 
 const activeTag = ref(null)
 const openTag = ref(null)
@@ -56,17 +58,13 @@ function isRelated(item) {
     </section>
 
     <section class="flex flex-col gap-3">
-      <article v-for="item in semanticTags" :key="item.tag" class="card overflow-hidden">
-        <button type="button" class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left" @click="selectTag(item.tag)">
-          <span class="flex items-center gap-3"><code class="rounded bg-slate-100 px-2 py-1 font-mono text-sm" :class="tagCategoryStyles[item.category]">&lt;{{ item.tag }}&gt;</code><span class="font-semibold text-slate-800">{{ item.role }}</span></span>
-          <span class="material-symbols-rounded text-slate-400">{{ openTag === item.tag ? 'expand_less' : 'expand_more' }}</span>
-        </button>
-        <div v-if="openTag === item.tag" class="border-t border-slate-100 px-5 py-4">
-          <p class="text-sm leading-relaxed text-slate-600"><span class="font-semibold text-slate-700">Когда использовать:</span> {{ item.when }}</p>
-          <p class="mt-3 text-sm"><span class="font-semibold text-slate-500">DOM-путь:</span> <code class="ml-1 font-mono text-slate-700">{{ item.path.join(' > ') }}</code></p>
-          <a class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline" :href="item.mdn" target="_blank" rel="noreferrer">Подробнее на MDN Web Docs <span class="material-symbols-rounded text-base">open_in_new</span></a>
-        </div>
-      </article>
+      <DisclosureCard v-for="item in semanticTags" :id="'html-' + item.tag" :key="item.tag" :open="openTag === item.tag" @toggle="selectTag(item.tag)">
+        <template #heading><code class="mr-3 rounded bg-slate-100 px-2 py-1 font-mono text-sm" :class="tagCategoryStyles[item.category]">&lt;{{ item.tag }}&gt;</code><span class="font-semibold text-slate-800">{{ item.role }}</span></template>
+        <div class="text-sm leading-relaxed text-slate-600"><RichText :text="item.definition" /></div>
+        <p class="mt-3 text-sm text-slate-600">Когда использовать: <RichText :text="item.when" /></p>
+        <p class="mt-3 break-words text-sm text-slate-600">Путь в этом примере: <code>{{ item.path.join(' > ') }}</code></p>
+        <a class="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-brand-700 hover:underline" :href="item.mdn" target="_blank" rel="noreferrer">Подробнее на MDN Web Docs ↗</a>
+      </DisclosureCard>
     </section>
   </div>
 </template>

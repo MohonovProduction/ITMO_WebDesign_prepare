@@ -1,30 +1,11 @@
-const mdn = (tag) => `https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/${tag}`
+import { htmlReferenceEntries, getConcept } from './concepts.js'
 
-export const semanticTags = [
-  { tag: 'html', parent: null, category: 'document', role: 'Корневой элемент HTML-документа.', when: 'Один раз в начале каждого HTML-документа; содержит `head` и `body`.', path: ['html'], mdn: mdn('html') },
-  { tag: 'head', parent: 'html', category: 'metadata', role: 'Метаданные документа: то, что помогает браузеру и поисковым системам, но не является видимым содержимым страницы.', when: 'Внутри `html`, перед `body`.', path: ['html', 'head'], mdn: mdn('head') },
-  { tag: 'title', parent: 'head', category: 'metadata', role: 'Название документа во вкладке браузера и закладках.', when: 'Один раз внутри `head`; текст должен описывать конкретную страницу.', path: ['html', 'head', 'title'], mdn: mdn('title') },
-  { tag: 'body', parent: 'html', category: 'document', role: 'Всё содержимое документа, которое браузер отображает пользователю.', when: 'Один раз внутри `html` после `head`.', path: ['html', 'body'], mdn: mdn('body') },
-  { tag: 'header', parent: 'body', category: 'landmark', role: 'Вводный блок страницы или раздела: логотип, заголовок, поиск, навигационные подсказки.', when: 'Для шапки всей страницы или конкретного раздела; это не синоним верхней визуальной полосы.', path: ['html', 'body', 'header'], mdn: mdn('header') },
-  { tag: 'nav', parent: 'header', category: 'landmark', role: 'Значимый блок навигационных ссылок по сайту или документу.', when: 'Для главного меню, оглавления или другой существенной навигации; не для каждой одиночной ссылки.', path: ['html', 'body', 'header', 'nav'], mdn: mdn('nav') },
-  { tag: 'main', parent: 'body', category: 'landmark', role: 'Доминирующее, уникальное содержание страницы.', when: 'Обычно один раз на странице; не включает повторяющиеся шапку, меню и футер.', path: ['html', 'body', 'main'], mdn: mdn('main') },
-  { tag: 'article', parent: 'main', category: 'sectioning', role: 'Самостоятельная единица контента, которую можно читать или распространять отдельно.', when: 'Для статьи, новости, карточки товара, поста или комментария.', path: ['html', 'body', 'main', 'article'], mdn: mdn('article') },
-  { tag: 'h1', parent: 'article', category: 'text', role: 'Заголовок первого уровня; часть смысловой иерархии документа.', when: 'Для главного заголовка статьи или страницы — уровень определяется структурой, а не размером шрифта.', path: ['html', 'body', 'main', 'article', 'h1'], mdn: mdn('h1') },
-  { tag: 'section', parent: 'article', category: 'sectioning', role: 'Тематический раздел документа.', when: 'Когда есть самостоятельная тема и обычно собственный заголовок; не как универсальная замена `div`.', path: ['html', 'body', 'main', 'article', 'section'], mdn: mdn('section') },
-  { tag: 'p', parent: 'section', category: 'text', role: 'Абзац связного текста.', when: 'Для текстового абзаца, а не для контейнера с другими блочными элементами.', path: ['html', 'body', 'main', 'article', 'section', 'p'], mdn: mdn('p') },
-  { tag: 'a', parent: 'p', category: 'text', role: 'Гиперссылка на другой адрес или якорь.', when: 'Когда действие пользователя — перейти к ресурсу; для действия на текущей странице используют `button`.', path: ['html', 'body', 'main', 'article', 'section', 'p', 'a'], mdn: mdn('a') },
-  { tag: 'ul', parent: 'section', category: 'sectioning', role: 'Неупорядоченный список однотипных пунктов.', when: 'Когда порядок пунктов не меняет смысл; для последовательности шагов используют `ol`.', path: ['html', 'body', 'main', 'article', 'section', 'ul'], mdn: mdn('ul') },
-  { tag: 'ol', parent: 'section', category: 'sectioning', role: 'Упорядоченный список, в котором порядок элементов значим.', when: 'Для шагов инструкции, рейтинга или другой последовательности.', path: ['html', 'body', 'main', 'article', 'section', 'ol'], mdn: mdn('ol') },
-  { tag: 'li', parent: 'ul', category: 'sectioning', role: 'Один пункт списка.', when: 'Только внутри `ul`, `ol` или `menu`; это не универсальный контейнер.', path: ['html', 'body', 'main', 'article', 'section', 'ul', 'li'], mdn: mdn('li') },
-  { tag: 'img', parent: 'section', category: 'embedded', role: 'Встраивает растровое или векторное изображение в документ.', when: 'Для содержательного изображения обязательно дать осмысленный `alt`; для декоративного — пустой `alt=""`.', path: ['html', 'body', 'main', 'article', 'section', 'img'], mdn: mdn('img') },
-  { tag: 'svg', parent: 'section', category: 'embedded', role: 'Контейнер для масштабируемой векторной графики SVG.', when: 'Для иконок, схем и интерактивной векторной графики; важным изображениям нужны название и доступное описание.', path: ['html', 'body', 'main', 'article', 'section', 'svg'], mdn: 'https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/svg' },
-  { tag: 'aside', parent: 'main', category: 'landmark', role: 'Содержание, косвенно связанное с основным: справка, связанные ссылки, врезка.', when: 'Если блок можно убрать без разрушения основного материала.', path: ['html', 'body', 'main', 'aside'], mdn: mdn('aside') },
-  { tag: 'form', parent: 'aside', category: 'interactive', role: 'Форма для сбора и отправки пользовательских данных.', when: 'Когда несколько полей образуют единое действие: поиск, обратная связь, заказ, вход.', path: ['html', 'body', 'main', 'aside', 'form'], mdn: mdn('form') },
-  { tag: 'label', parent: 'form', category: 'interactive', role: 'Текстовая подпись, связанная с полем ввода.', when: 'У каждого поля, которое требует объяснения; связывается через `for`/`id` или вложенность.', path: ['html', 'body', 'main', 'aside', 'form', 'label'], mdn: mdn('label') },
-  { tag: 'input', parent: 'form', category: 'interactive', role: 'Интерактивное поле ввода с типом, именем и ограничениями.', when: 'Для коротких данных: текст, email, пароль, дата, флажок и т. д.; выбирайте подходящий `type`.', path: ['html', 'body', 'main', 'aside', 'form', 'input'], mdn: mdn('input') },
-  { tag: 'button', parent: 'form', category: 'interactive', role: 'Элемент, запускающий действие в текущем интерфейсе.', when: 'Для отправки формы, открытия меню, переключения состояния; ссылку не заменяет.', path: ['html', 'body', 'main', 'aside', 'form', 'button'], mdn: mdn('button') },
-  { tag: 'footer', parent: 'body', category: 'landmark', role: 'Завершающая служебная часть страницы или раздела.', when: 'Для авторства, копирайта, контактов и связанных документов.', path: ['html', 'body', 'footer'], mdn: mdn('footer') },
-]
+export const semanticTags = htmlReferenceEntries.map(entry => ({
+  ...entry,
+  role: entry.summary,
+  when: entry.usage,
+  definition: getConcept(entry.conceptId).definition,
+}))
 
 export const tagCategoryStyles = {
   document: 'text-violet-700',

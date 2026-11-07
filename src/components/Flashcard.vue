@@ -1,22 +1,14 @@
 <script setup>
-import { computed } from 'vue'
-import MathText from '@/components/MathText.vue'
-import Formula from '@/components/Formula.vue'
 import RichText from '@/components/RichText.vue'
 
 const props = defineProps({
   card: { type: Object, required: true },
   flipped: { type: Boolean, default: false },
   status: { type: String, default: null }, // 'known' | 'unknown' | null
-  variant: { type: String, default: 'default' }, // 'default' | 'formulaRecall'
 })
 
 const emit = defineEmits(['flip', 'know', 'dontknow'])
 
-const isFormulaRecall = computed(() => props.variant === 'formulaRecall')
-const theoryLink = computed(() =>
-  props.card.theoryId != null ? { path: '/theory', query: { q: String(props.card.theoryId) } } : null,
-)
 </script>
 
 <template>
@@ -27,49 +19,39 @@ const theoryLink = computed(() =>
         :class="{ 'is-flipped': flipped }"
         role="button"
         tabindex="0"
+        :aria-label="flipped ? 'Показать вопрос' : 'Показать ответ'"
+        :aria-describedby="`${card.id}-${flipped ? 'answer' : 'question'}`"
+        :aria-pressed="flipped"
         @click="emit('flip')"
         @keydown.enter.prevent="emit('flip')"
         @keydown.space.prevent="emit('flip')"
       >
         <div
+          :aria-hidden="flipped"
+          :inert="flipped"
           class="flip-face card absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center"
         >
           <span class="chip bg-slate-100 text-slate-500">
-            {{ isFormulaRecall ? 'Задание' : 'Вопрос' }}
+            Вопрос
           </span>
-          <div class="text-xl font-semibold leading-snug text-slate-900 sm:text-2xl">
+          <div :id="`${card.id}-question`" class="text-xl font-semibold leading-snug text-slate-900 sm:text-2xl">
             <RichText :text="card.front" />
           </div>
-          <p v-if="card.purposeFor && !isFormulaRecall" class="max-w-md text-xs text-slate-500">
+          <p v-if="card.purposeFor" class="max-w-md text-xs text-slate-500">
             <RichText :text="card.purposeFor" />
-          </p>
-          <p v-if="isFormulaRecall" class="max-w-md text-sm text-slate-500">
-            Запишите формулу на бумаге, затем переверните и сверьте.
           </p>
           <span class="mt-2 text-xs text-slate-400">Нажмите, чтобы перевернуть</span>
         </div>
 
         <div
+          :aria-hidden="!flipped"
+          :inert="!flipped"
           class="flip-face flip-back card absolute inset-0 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-brand-50 p-6 text-center ring-brand-100"
         >
-          <span class="chip bg-brand-100 text-brand-700">Формула</span>
-          <div
-            v-if="isFormulaRecall"
-            class="w-full max-w-lg text-base leading-relaxed text-slate-800 sm:text-lg"
-          >
-            <Formula :expr="card.back" />
-          </div>
-          <div v-else class="text-base leading-relaxed text-slate-800 sm:text-lg">
+          <span class="chip bg-brand-100 text-brand-700">Ответ</span>
+          <div :id="`${card.id}-answer`" class="text-base leading-relaxed text-slate-800 sm:text-lg">
             <RichText :text="card.back" />
           </div>
-          <RouterLink
-            v-if="isFormulaRecall && theoryLink"
-            :to="theoryLink"
-            class="text-xs text-brand-700 hover:underline"
-            @click.stop
-          >
-            Подробнее в теории →
-          </RouterLink>
         </div>
       </div>
     </div>

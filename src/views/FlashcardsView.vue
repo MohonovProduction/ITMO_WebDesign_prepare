@@ -1,29 +1,30 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import ChoiceChips from '@/components/ChoiceChips.vue'
 import Flashcard from '@/components/Flashcard.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 import { WEB_DECKS, cardsByDeck } from '@/data/webFlashcards'
+import { useWebProgressStore } from '@/store/webProgress'
 
-const STORAGE_KEY = 'webdesign_flashcards_v1'
-const activeDeck = ref('semantic')
+const store = useWebProgressStore()
+const session = store.cardSession
+const activeDeck = ref(WEB_DECKS.some(deck => deck.id === session?.deck) ? session.deck : 'semantic')
+const filter = ref(session?.filter || 'all')
 const index = ref(0)
 const flipped = ref(false)
-const marks = ref(loadMarks())
+const marks = computed(() => store.marks)
 
-function loadMarks() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {} } catch { return {} }
-}
-
-const cards = computed(() => cardsByDeck(activeDeck.value))
+const allCards = computed(() => cardsByDeck(activeDeck.value))
+const cards = computed(() => allCards.value.filter(card => filter.value === 'all' || (filter.value === 'unknown' ? marks.value[card.id] === 'unknown' : !marks.value[card.id])))
+index.value = Math.max(0, cards.value.findIndex(card => card.id === session?.cardId))
 const current = computed(() => cards.value[index.value] || null)
 const stats = computed(() => {
-  const list = cards.value
+  const list = allCards.value
   const known = list.filter((item) => marks.value[item.id] === 'known').length
   const unknown = list.filter((item) => marks.value[item.id] === 'unknown').length
   return { total: list.length, known, unknown, percent: list.length ? Math.round((known / list.length) * 100) : 0 }
 })
 
-function saveMarks() { localStorage.setItem(STORAGE_KEY, JSON.stringify(marks.value)) }
 function selectDeck(id) { activeDeck.value = id }
 function go(delta) {
   const total = cards.value.length
@@ -33,21 +34,22 @@ function go(delta) {
 }
 function mark(status) {
   if (!current.value) return
-  marks.value = { ...marks.value, [current.value.id]: status }
-  saveMarks()
-  if (index.value < cards.value.length - 1) go(1)
-  else flipped.value = false
+  const oldIndex = index.value
+  store.markCard(current.value.id, status)
+  if (filter.value === 'all' || (filter.value === 'unknown' && status === 'unknown')) go(1)
+  else { index.value = Math.min(oldIndex, Math.max(0, cards.value.length - 1)); flipped.value = false }
 }
 function resetDeck() {
-  const next = { ...marks.value }
-  cards.value.forEach((item) => delete next[item.id])
-  marks.value = next
-  saveMarks()
+  store.resetCards(allCards.value.map(item => item.id))
   index.value = 0
   flipped.value = false
 }
 
 watch(activeDeck, () => { index.value = 0; flipped.value = false })
+watch(filter, () => { index.value = 0; flipped.value = false })
+watch([activeDeck, filter, () => current.value?.id], () => {
+  store.saveCardSession({ deck: activeDeck.value, filter: filter.value, cardId: current.value?.id || null })
+}, { flush: 'post' })
 </script>
 
 <template>
@@ -65,6 +67,8 @@ watch(activeDeck, () => { index.value = 0; flipped.value = false })
       </button>
     </div>
 
+    <ChoiceChips v-model="filter" :options="[{ id: 'all', label: 'Все карточки' }, { id: 'unknown', label: 'Повторить незнакомые' }, { id: 'new', label: 'Ещё не изучены' }]" label="Режим повторения" />
+    <p v-if="session" class="text-sm text-slate-500">Занятие продолжено с сохранённого места.</p>
     <div class="card p-4">
       <ProgressBar :value="stats.percent" label="Уверенно знаю" color="emerald" />
       <div class="mt-2 flex justify-between text-xs text-slate-500">
@@ -82,6 +86,10 @@ watch(activeDeck, () => { index.value = 0; flipped.value = false })
       <div class="mt-3 flex items-center justify-between">
         <button class="btn-secondary" @click="go(-1)">← Назад</button><button class="btn-secondary" @click="flipped = !flipped">Перевернуть</button><button class="btn-secondary" @click="go(1)">Вперёд →</button>
       </div>
+    </div>
+    <div v-else class="card p-6 text-center" role="status">
+      <p>{{ filter === 'unknown' ? 'В этой колоде нет карточек для повторения.' : 'Все карточки этой колоды уже просмотрены.' }}</p>
+      <button class="btn-secondary mt-4" @click="filter = 'all'">Открыть все карточки</button>
     </div>
   </div>
 </template>

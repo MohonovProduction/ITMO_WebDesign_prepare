@@ -8,11 +8,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build-dataset": "node scripts/build-dataset.mjs",
+    "test": "node --test scripts/*.test.mjs",
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
-    "katex": "^0.16.11",
     "pinia": "^2.2.6",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"

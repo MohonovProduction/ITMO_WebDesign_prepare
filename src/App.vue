@@ -1,19 +1,21 @@
 <script setup>
 import { onMounted } from 'vue'
 import AppHeader from '@/components/AppHeader.vue'
-import { useProgressStore } from '@/store/progress'
+import { useWebProgressStore } from '@/store/webProgress'
 
-const store = useProgressStore()
+const store = useWebProgressStore()
 
 onMounted(() => {
   store.recordPrepDay()
+  store.persist()
 })
 </script>
 
 <template>
   <AppHeader />
+  <p v-if="store.storageError" role="status" class="mx-auto mt-4 w-full max-w-5xl rounded-xl bg-amber-50 p-4 text-sm text-amber-900">{{ store.storageError }}</p>
 
-  <main class="mx-auto w-full max-w-5xl flex-1 px-4 pb-24 pt-6 sm:px-6">
+  <main id="main-content" tabindex="-1" class="mx-auto w-full max-w-5xl flex-1 px-4 pb-24 pt-6 sm:px-6">
     <RouterView v-slot="{ Component }">
       <Transition name="fade" mode="out-in">
         <component :is="Component" />
