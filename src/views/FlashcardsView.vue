@@ -93,7 +93,7 @@ watch([activeDeck, topic, filter, () => current.value?.id], () => {
     <div v-if="current">
       <div class="mb-3 flex items-center justify-between text-sm text-slate-500">
         <span>Карточка {{ index + 1 }} из {{ cards.length }}</span>
-        <button class="text-rose-500 hover:underline" @click="resetDeck">Сбросить колоду</button>
+        <button class="text-brand-700 hover:underline" @click="resetDeck">Сбросить отметки темы</button>
       </div>
       <Flashcard :card="current" :flipped="flipped" :status="marks[current.id] || null" @flip="flipped = !flipped" @know="mark('known')" @dontknow="mark('unknown')" />
       <p class="mt-4 text-center text-xs text-slate-400">Связанные вопросы: {{ current.examRefs.map((id) => id.replace('-', ' №')).join(', ') }}</p>

@@ -59,6 +59,14 @@ body::before {
   flex-direction: column;
 }
 
+/* Подложка сохраняет читаемость вводного текста поверх узорного фона. */
+#main-content > div > header {
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 88%);
+  backdrop-filter: blur(8px);
+}
+
 /* Material Symbols (Rounded) */
 .material-symbols-rounded {
   font-family: 'Material Symbols Rounded';
