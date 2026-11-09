@@ -6,6 +6,7 @@ import RichText from '@/components/RichText.vue'
 import { useWebProgressStore } from '@/store/webProgress'
 
 const store = useWebProgressStore()
+store.rememberActivity('/practice', 'Экзаменационный ответ')
 const attemptId = ref(crypto.randomUUID())
 const saved = ref(false)
 const mode = ref('mixed')

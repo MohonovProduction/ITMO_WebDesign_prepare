@@ -1,4 +1,4 @@
-import { TRACKS } from './tracks'
+import { TRACKS } from './tracks.js'
 
 const techTopics = [
   'Устройство сайта и его аппаратно-программное окружение',

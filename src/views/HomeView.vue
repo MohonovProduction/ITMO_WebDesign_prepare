@@ -1,78 +1,36 @@
 <script setup>
+import { computed } from 'vue'
 import { TRACKS } from '@/data/tracks'
-import { topicsByTrack } from '@/data/webTheory'
+import { theoryBranches, theoryForTopic } from '@/data/theoryTopics'
+import { webFlashcards } from '@/data/webFlashcards'
+import { exerciseIds, trainersForTopic } from '@/data/trainers'
+import { learningStats } from '@/utils/learningStats'
+import { useWebProgressStore } from '@/store/webProgress'
+const store = useWebProgressStore()
+const leaves = theoryBranches.flatMap(b => b.children)
+const stats = computed(() => learningStats(store, webFlashcards, leaves.map(t => t.id), exerciseIds))
+const nextTopic = computed(() => leaves.find(t => !store.learnedTopics.includes(t.id)))
+const resume = computed(() => store.lastActivity || {path:'/theory',label:'Начать с теории'})
+const percent = (value,total) => total ? Math.round(value/total*100) : 0
 </script>
-
 <template>
   <div class="flex flex-col gap-6">
-    <section class="card overflow-hidden">
-      <div
-        class="p-6 text-slate-800 sm:p-8"
-        style="background-image: var(--study-gradient)"
-      >
-        <p class="text-sm font-bold uppercase tracking-[0.16em] text-slate-600">ИТМО · 2 семестр</p>
-        <h1 class="mt-2 text-2xl font-extrabold sm:text-3xl">Веб-проектирование · подготовка к экзамену</h1>
-        <p class="mt-1 max-w-xl text-slate-700">
-          Два экзаменационных блока, карточки с деревом тем и интерактивные лаборатории.
-          Изучайте понятия на примерах и проверяйте себя в тренировке билетов.
-        </p>
-      </div>
+    <section class="card overflow-hidden"><div class="p-6 sm:p-8" style="background:var(--study-gradient)"><p class="text-xs font-bold uppercase tracking-widest">ИТМО · веб-проектирование</p><h1 class="mt-2 text-3xl font-extrabold">Ваше обучение</h1><p class="mt-2 text-sm">Теория, примеры и практика — в одном маршруте.</p><RouterLink :to="resume.path" class="btn-secondary mt-5">{{ store.lastActivity ? 'Вернуться: ' : '' }}{{ resume.label }} →</RouterLink></div></section>
+    <section aria-label="Прогресс обучения" class="grid gap-4 sm:grid-cols-3">
+      <article class="card p-5"><h2 class="font-bold">Теория</h2><p class="my-3 text-3xl font-extrabold">{{ stats.learned }} <span class="text-base font-normal text-slate-500">/ {{ leaves.length }} тем</span></p><progress :value="stats.learned" :max="leaves.length" aria-label="Темы, отмеченные как разобранные" class="w-full accent-brand-600"/><p class="mt-2 text-xs text-slate-500">{{ percent(stats.learned, leaves.length) }}% · ваша отметка «Разобрал»</p><RouterLink to="/theory" class="mt-3 inline-block text-sm underline">Изучать темы →</RouterLink></article>
+      <article class="card p-5"><h2 class="font-bold">Карточки</h2><p class="my-3 text-3xl font-extrabold">{{ stats.known }} <span class="text-base font-normal text-slate-500">/ {{ webFlashcards.length }} знаю</span></p><progress :value="stats.known" :max="webFlashcards.length" aria-label="Известные карточки" class="w-full accent-brand-600"/><p class="mt-2 text-xs text-slate-500">Повторить: {{ stats.unknown }} · новые: {{ stats.newCards }}</p><RouterLink to="/flashcards" class="mt-3 inline-block text-sm underline">Повторить →</RouterLink></article>
+      <article class="card p-5"><h2 class="font-bold">Упражнения</h2><p class="my-3 text-3xl font-extrabold">{{ stats.mastered }} <span class="text-base font-normal text-slate-500">/ {{ exerciseIds.length }} решено</span></p><progress :value="stats.mastered" :max="exerciseIds.length" aria-label="Упражнения с верным решением" class="w-full accent-brand-600"/><p class="mt-2 text-xs text-slate-500">{{ stats.accuracy === null ? 'Пока нет ответов' : `Точность: ${stats.accuracy}% · ответов: ${stats.attempts}` }}</p><RouterLink to="/trainers" class="mt-3 inline-block text-sm underline">Тренироваться →</RouterLink></article>
     </section>
-
-    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <RouterLink
-        v-for="track in TRACKS"
-        :key="track.id"
-        :to="{ path: '/theory', query: { track: track.id } }"
-        class="card flex items-start gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md"
-      >
-        <div class="emoji flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-brand-50 text-2xl">
-          {{ track.icon }}
-        </div>
-        <div>
-          <p class="text-xs font-semibold text-slate-400">{{ track.teacher }} · {{ track.points }} баллов</p>
-          <h2 class="font-bold text-slate-900">{{ track.title }}</h2>
-          <p class="text-sm text-slate-500">{{ topicsByTrack(track.id).length }} вопросов · {{ track.description }}</p>
-        </div>
-      </RouterLink>
-    </section>
-
-    <RouterLink to="/flashcards" class="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md">
-      <div class="emoji flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-brand-50 text-2xl">🃏</div>
-      <div>
-        <h2 class="font-bold text-slate-900">Повторить в карточках</h2>
-        <p class="text-sm text-slate-500">Семантические HTML-теги, SVG и определения из конспектов.</p>
-      </div>
-    </RouterLink>
-
-    <RouterLink to="/practice" class="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md">
-      <div class="emoji flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-brand-50 text-2xl">🎓</div>
-      <div>
-        <h2 class="font-bold text-slate-900">Тренировка билета</h2>
-        <p class="text-sm text-slate-500">Случайные вопросы, опорный план и самооценка устного ответа.</p>
-      </div>
-    </RouterLink>
-
-    <RouterLink to="/semantics" class="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md">
-      <div class="emoji flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-brand-50 text-2xl">🌳</div>
-      <div>
-        <h2 class="font-bold text-slate-900">Справочник HTML-семантики</h2>
-        <p class="text-sm text-slate-500">Интерактивное дерево страницы, DOM-пути и ссылки на MDN.</p>
-      </div>
-    </RouterLink>
-
-    <div class="grid gap-4 sm:grid-cols-2">
-      <RouterLink to="/css" class="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md"><div class="emoji flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-2xl">🎨</div><div><h2 class="font-bold text-slate-900">Справочник CSS</h2><p class="text-sm text-slate-500">Селекторы, шрифты, раскладка, состояния и адаптив.</p></div></RouterLink>
-      <RouterLink to="/svg" class="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md"><div class="emoji flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-2xl">✒️</div><div><h2 class="font-bold text-slate-900">Справочник SVG</h2><p class="text-sm text-slate-500">Интерактивная схема и элементы векторной графики.</p></div></RouterLink>
-    </div>
-
-    <section class="card p-5">
-      <h2 class="text-lg font-bold text-slate-900">От темы — к уверенному ответу</h2>
-      <p class="mt-2 max-w-2xl text-sm text-slate-600">
-        Прочитайте конспект, попробуйте интерактивный пример и закрепите определение карточками.
-        Затем проговорите ответ на билет и оцените каждый вопрос отдельно.
-      </p>
-      <RouterLink to="/tracks" class="btn-secondary mt-4">Посмотреть карту экзамена →</RouterLink>
-    </section>
+    <p class="text-xs text-slate-600">Решено — хотя бы один верный ответ на задание. Точность учитывает все проверки, включая повторные. Выбор и ввод селектора считаются отдельно. Прогресс хранится в этом браузере.</p>
+    <section v-if="stats.unknown || nextTopic" class="card p-5"><h2 class="text-lg font-bold">Следующий шаг</h2><div class="mt-3 flex flex-wrap gap-3"><RouterLink v-if="stats.unknown" to="/flashcards?filter=unknown" class="btn-primary">Повторить незнакомые · {{ stats.unknown }}</RouterLink><RouterLink v-if="nextTopic" :to="{path:'/theory',query:{topic:nextTopic.id}}" class="btn-secondary">Разобраться: {{ nextTopic.label }} →</RouterLink></div></section>
+    <section><h2 class="mb-4 text-xl font-bold">Что изучаем</h2><div class="grid gap-4 sm:grid-cols-2"><article v-for="branch in theoryBranches" :key="branch.id" class="card p-5"><h3 class="text-lg font-bold">{{ branch.label }}</h3><p class="mt-2 text-sm text-slate-500">Разобрано {{ branch.children.filter(t => store.learnedTopics.includes(t.id)).length }} из {{ branch.children.length }} тем</p><div class="mt-4 flex flex-wrap gap-3"><RouterLink :to="{path:'/theory',query:{topic:branch.id}}" class="btn-secondary">Теория</RouterLink><RouterLink v-if="theoryForTopic(branch.id).concepts.length" :to="{path:'/flashcards',query:{topic:branch.id}}" class="btn-secondary">Карточки</RouterLink><RouterLink v-if="trainersForTopic(branch.id).length" :to="{path:'/trainers',query:{topic:branch.id}}" class="btn-secondary">Практика</RouterLink></div></article></div></section>
+    <section class="card p-5"><h2 class="text-lg font-bold">Подготовка по билетам</h2><div class="mt-4 flex flex-wrap gap-3"><RouterLink v-for="track in TRACKS" :key="track.id" :to="{path:'/theory',query:{track:track.id}}" class="btn-secondary">{{ track.title }}</RouterLink><RouterLink to="/practice" class="btn-secondary">Проговорить ответ</RouterLink></div><p class="mt-3 text-xs text-slate-500">Сохранено тренировок ответа: {{ store.attempts.length }} · дней подготовки: {{ store.prepDays.length }}</p></section>
+    <section class="card p-5"><h2 class="text-lg font-bold">Интерактивные справочники</h2><div class="mt-4 flex flex-wrap gap-3"><RouterLink to="/semantics" class="btn-secondary">HTML</RouterLink><RouterLink to="/css" class="btn-secondary">CSS</RouterLink><RouterLink to="/svg" class="btn-secondary">SVG</RouterLink></div></section>
   </div>
 </template>
+<style scoped>
+progress { display:block;height:8px;border:0;border-radius:999px;overflow:hidden;background:#e2e8f0; }
+progress::-webkit-progress-bar { background:#e2e8f0;border-radius:999px; }
+progress::-webkit-progress-value { background:var(--study-gradient);border-radius:999px;transition:width .3s ease; }
+progress::-moz-progress-bar { background:var(--study-gradient);border-radius:999px; }
+</style>

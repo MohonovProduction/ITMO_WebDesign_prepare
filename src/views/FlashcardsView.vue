@@ -1,20 +1,22 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import ChoiceChips from '@/components/ChoiceChips.vue'
 import Flashcard from '@/components/Flashcard.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 import { WEB_DECKS, cardsByDeck, webFlashcards } from '@/data/webFlashcards'
 import { matchesTopic, topicBranches } from '@/data/topics'
-import TopicTree from '@/components/TopicTree.vue'
-import ResponsiveControls from '@/components/ResponsiveControls.vue'
 import { useWebProgressStore } from '@/store/webProgress'
 
 const store = useWebProgressStore()
+const route = useRoute()
 const session = store.cardSession
 const activeDeck = ref(session?.deck === 'all' || WEB_DECKS.some(deck => deck.id === session?.deck) ? session.deck : 'semantic')
 const topic = ref(session?.topicId || (activeDeck.value === 'semantic' ? 'html' : activeDeck.value === 'definitions' ? 'ux' : activeDeck.value))
 const topicLabel = computed(() => [ ...topicBranches, ...topicBranches.flatMap(branch => branch.children) ].find(item => item.id === topic.value)?.label || 'Все темы')
+const topicOptions = computed(() => [{ id: 'all', label: 'Все темы' }, ...topicBranches.flatMap(branch => [branch, ...branch.children]).filter(t => webFlashcards.some(card => matchesTopic(card, t.id))).map(t => ({ id: t.id, label: t.label }))])
 const filter = ref(session?.filter || 'all')
+store.rememberActivity('/flashcards', 'Карточки повторения')
 const index = ref(0)
 const flipped = ref(false)
 const marks = computed(() => store.marks)
@@ -34,7 +36,15 @@ function selectDeck(id) { activeDeck.value = id; topic.value = id === 'semantic'
 function selectTopic(id) {
   topic.value = id
   activeDeck.value = topicBranches.find(branch => id === branch.id || id.startsWith(`${branch.id}.`))?.deck || 'all'
+  index.value = 0
+  flipped.value = false
 }
+function applyTopicQuery(id) {
+  if (id === 'all' || topicBranches.some(branch => branch.id === id || branch.children.some(child => child.id === id))) { selectTopic(id); filter.value = 'all' }
+}
+applyTopicQuery(route.query.topic)
+if (route.query.filter === 'unknown') { selectTopic('all'); filter.value = 'unknown' }
+watch(() => route.query.topic, applyTopicQuery)
 function go(delta) {
   const total = cards.value.length
   if (!total) return
@@ -69,9 +79,9 @@ watch([activeDeck, topic, filter, () => current.value?.id], () => {
       <p class="text-slate-500">Термин → объяснение → связь с экзаменационным вопросом. Отмечайте то, что нужно повторить.</p>
     </header>
 
-    <div class="study-layout">
-    <aside class="topic-panel"><ResponsiveControls title="Дерево тем" trigger-label="Выбрать тему"><div class="card p-4"><h2 class="mb-3 font-semibold">Дерево тем</h2><TopicTree :model-value="topic" @update:model-value="selectTopic" /></div></ResponsiveControls></aside>
+    <div>
     <div class="min-w-0 flex flex-col gap-5">
+    <details class="card p-4"><summary class="cursor-pointer font-semibold">Фильтр по теме: {{ topicLabel }}</summary><div class="mt-4"><ChoiceChips :model-value="topic" :options="topicOptions" label="Тема повторения" @update:model-value="selectTopic" /></div></details>
     <div class="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-4 sm:overflow-visible">
       <button v-for="deck in WEB_DECKS" :key="deck.id" class="flex min-w-[9rem] flex-none flex-col items-center gap-0.5 rounded-xl px-3 py-3 text-center transition sm:min-w-0" :class="activeDeck === deck.id ? 'bg-brand-gradient text-slate-800 shadow-sm' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'" @click="selectDeck(deck.id)">
         <span class="emoji text-xl">{{ deck.icon }}</span>
@@ -93,7 +103,7 @@ watch([activeDeck, topic, filter, () => current.value?.id], () => {
     <div v-if="current">
       <div class="mb-3 flex items-center justify-between text-sm text-slate-500">
         <span>Карточка {{ index + 1 }} из {{ cards.length }}</span>
-        <button class="text-rose-500 hover:underline" @click="resetDeck">Сбросить колоду</button>
+        <button class="text-brand-700 hover:underline" @click="resetDeck">Сбросить отметки темы</button>
       </div>
       <Flashcard :card="current" :flipped="flipped" :status="marks[current.id] || null" @flip="flipped = !flipped" @know="mark('known')" @dontknow="mark('unknown')" />
       <p class="mt-4 text-center text-xs text-slate-400">Связанные вопросы: {{ current.examRefs.map((id) => id.replace('-', ' №')).join(', ') }}</p>
@@ -108,7 +118,3 @@ watch([activeDeck, topic, filter, () => current.value?.id], () => {
     </div></div>
   </div>
 </template>
-
-<style scoped>
-.study-layout{display:grid;gap:24px}.topic-panel{min-width:0}@media(min-width:1024px){.study-layout{grid-template-columns:250px minmax(0,1fr)}.topic-panel{align-self:start;position:sticky;top:96px;max-height:calc(100dvh - 112px);overflow:auto}}
-</style>

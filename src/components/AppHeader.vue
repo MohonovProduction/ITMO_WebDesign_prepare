@@ -6,12 +6,13 @@ const open = ref(false)
 const activeGroup = ref(null)
 const header = ref(null)
 const groups = [
-  { id:'learn', label:'Учиться', text:'Понять и связать темы', links:[
-    {to:'/theory',label:'Теория',description:'Два блока экзамена'},
+  { id:'learn', label:'Теория', text:'Понять и связать темы', links:[
+    {to:'/theory',label:'Темы и конспекты',description:'Диаграмма тем и два блока экзамена'},
     {to:'/tracks',label:'Карта экзамена',description:'Вопросы и структура подготовки'},
   ]},
-  { id:'practice',label:'Повторять',text:'Закрепить и проверить',links:[
-    {to:'/flashcards',label:'Карточки и дерево тем',description:'Повторение незнакомого'},
+  { id:'practice',label:'Тренажёры',text:'Закрепить и проверить',links:[
+    {to:'/trainers',label:'Все тренажёры',description:'Селекторы, семантика и формы'},
+    {to:'/flashcards',label:'Карточки',description:'Повторение незнакомого'},
     {to:'/practice',label:'Билет',description:'Устный ответ и самопроверка'},
   ]},
   { id:'references',label:'Справочники',text:'Попробовать на практике',links:[
