@@ -44,7 +44,7 @@ test('restores a filtered card session and per-topic scores including fractional
   let persisted
   const storage = { setItem(key, value) { persisted = value }, getItem() { return persisted } }
   const progress = {
-    cardSession: { deck: 'css', filter: 'unknown', cardId: 'css-grid' },
+    cardSession: { deck: 'css', topicId: 'css.layout', filter: 'unknown', cardId: 'css-grid' },
     attempts: [{ id: 'mixed', at: 123, score: 2.5, topics: ['tech-1', 'ux-1'], topicScores: [{ topicId: 'tech-1', score: 4 }, { topicId: 'ux-1', score: 1 }] }],
   }
   assert.equal(saveWebProgress(storage, progress), '')

@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test scripts/*.test.mjs",
-    "deploy": "npm run build && gh-pages -d dist"
+    "check:pages": "npm test && npm run build"
   },
   "dependencies": {
     "pinia": "^2.2.6",

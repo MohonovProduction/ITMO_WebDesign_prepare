@@ -10,7 +10,17 @@ const active = ref('html-form')
 const submitted = ref(false)
 const current = computed(() => inputTypes.find(item => item.type === type.value))
 const selected = computed(() => active.value ? getConcept(active.value) : null)
-const code = computed(() => `<form method="post">\n  <fieldset>\n    <legend>Данные заявки</legend>\n    <label for="demo-field">${current.value.title}</label>\n    <input id="demo-field" name="answer" type="${type.value}" />\n  </fieldset>\n  <button type="submit">Отправить</button>\n</form>`)
+const code = computed(() => {
+  let field
+  if (type.value === 'radio') {
+    field = '    <label><input type="radio" name="answer" value="email">Почта</label>\n    <label><input type="radio" name="answer" value="phone">Телефон</label>'
+  } else if (['hidden', 'submit'].includes(type.value)) {
+    field = `    <input name="answer" type="${type.value}" value="${type.value === 'hidden' ? 'course-web' : 'Отправить'}">`
+  } else {
+    field = `    <label for="demo-field">${current.value.title}</label>\n    <input id="demo-field" name="answer" type="${type.value}">`
+  }
+  return `<form method="post">\n  <fieldset>\n    <legend>Данные заявки</legend>\n${field}\n  </fieldset>\n  <button type="submit">Проверить отправку</button>\n</form>`
+})
 function selectType(value) { type.value = value; active.value = `html-input-${value}`; submitted.value = false }
 const options = inputTypes.map(item => ({ id: item.type, label: item.type }))
 </script>
@@ -19,7 +29,7 @@ const options = inputTypes.map(item => ({ id: item.type, label: item.type }))
     <h2 class="text-xl font-bold">Как устроена форма</h2><p class="mt-2 text-sm text-slate-600">Выберите тип поля. Ввод работает локально: данные никуда не отправляются.</p>
     <div class="mt-4"><ChoiceChips :model-value="type" :options="options" label="Тип input" @update:model-value="selectType" /></div>
     <div class="mt-5 grid gap-5 lg:grid-cols-2">
-      <form class="rounded-xl border border-slate-200 bg-slate-50 p-5" @submit.prevent="submitted = true; active = 'html-form'" @focusin="active = current.conceptId">
+      <form method="post" class="rounded-xl border border-slate-200 bg-slate-50 p-5" @submit.prevent="submitted = true; active = 'html-form'" @focusin="active = current.conceptId">
         <fieldset class="rounded-lg border border-slate-300 p-4"><legend class="px-2 font-semibold">Данные заявки</legend>
           <label v-if="!['hidden', 'submit', 'radio'].includes(type)" for="demo-field" class="mb-2 block text-sm font-semibold">{{ current.title }}</label>
           <template v-if="type === 'radio'"><label class="mr-4 inline-flex gap-2"><input type="radio" name="answer" value="email">Почта</label><label class="inline-flex gap-2"><input type="radio" name="answer" value="phone">Телефон</label></template>

@@ -43,8 +43,20 @@ npm run preview
 ## GitHub Pages
 
 `base` в `vite.config.js` соответствует репозиторию `ITMO_WebDesign_prepare`.
-Публикация выполняется пользователем через `npm run deploy` в ветку `gh-pages`.
-В Settings → Pages источником должна быть эта ветка.
+Исходники находятся в ветке `gh-pages`. Workflow `.github/workflows/pages.yml`
+после пуша в эту ветку устанавливает зависимости, запускает тесты и сборку,
+а затем публикует **содержимое `dist`** через GitHub Actions.
+
+1. В Settings → Pages → Build and deployment выберите Source: **GitHub Actions**.
+2. Закоммитьте изменения и выполните `git push origin gh-pages` самостоятельно.
+3. Дождитесь успешного workflow **Deploy to GitHub Pages** во вкладке Actions.
+
+Повторную публикацию можно запустить через Actions → Deploy to GitHub Pages → Run workflow.
+Папка `dist` не коммитится. Hash-маршрутизация позволяет открывать и обновлять
+ссылки вроде `/#/css` без серверных правил перенаправления.
+
+Старый скрипт `npm run deploy` удалён: он перезаписывал бы ветку `gh-pages`
+собранными файлами вместо исходников. Для локальной проверки используйте `npm run check:pages`.
 
 Сайт: https://mohonovproduction.github.io/ITMO_WebDesign_prepare/
 
