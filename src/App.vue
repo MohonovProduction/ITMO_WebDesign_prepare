@@ -2,6 +2,7 @@
 import { onMounted } from 'vue'
 import AppHeader from '@/components/AppHeader.vue'
 import DailyWarmup from '@/components/DailyWarmup.vue'
+import ProgressToast from '@/components/ProgressToast.vue'
 import { useWebProgressStore } from '@/store/webProgress'
 
 const store = useWebProgressStore()
@@ -15,6 +16,7 @@ onMounted(() => {
 <template>
   <AppHeader />
   <DailyWarmup />
+  <ProgressToast />
   <p v-if="store.storageError" role="status" class="mx-auto mt-4 w-full max-w-5xl rounded-xl bg-amber-50 p-4 text-sm text-amber-900">{{ store.storageError }}</p>
 
   <main id="main-content" tabindex="-1" class="mx-auto w-full max-w-5xl flex-1 px-4 pb-24 pt-6 sm:px-6">

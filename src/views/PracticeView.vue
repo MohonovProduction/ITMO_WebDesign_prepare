@@ -4,6 +4,7 @@ import { webTheory } from '@/data/webTheory'
 import { TRACKS } from '@/data/tracks'
 import RichText from '@/components/RichText.vue'
 import { useWebProgressStore } from '@/store/webProgress'
+import { notifyProgress } from '@/store/notifications'
 
 const store = useWebProgressStore()
 store.rememberActivity('/practice', 'Экзаменационный ответ')
@@ -58,6 +59,7 @@ const average = computed(() => attempts.value ? Math.round((history.value.reduce
 
 function saveAttempt() {
   if (saved.value) return
+  const previousCount = store.attempts.length
   const item = {
     id: attemptId.value,
     at: Date.now(),
@@ -66,6 +68,7 @@ function saveAttempt() {
     topicScores: ticket.value.map(topic => ({ topicId: topic.id, score: topicScore(topic.id), criteria: { ...ratings.value[topic.id] } })),
   }
   saved.value = store.saveAttempt(item)
+  if (saved.value) notifyProgress('Тренировка ответа сохранена', [{label:'Сохранено тренировок',before:String(previousCount),after:String(store.attempts.length),change:'+1 тренировка'}, {label:'Самооценка ответа',before:'—',after:`${item.score} / 4`,change:'Результат доступен в истории тренировок'}])
 }
 
 function trackTitle(id) { return TRACKS.find((track) => track.id === id)?.shortTitle || id }

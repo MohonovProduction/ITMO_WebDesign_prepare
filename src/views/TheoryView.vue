@@ -10,6 +10,9 @@ import { useWebProgressStore } from '@/store/webProgress'
 import { trainersForTopic } from '@/data/trainers'
 import { theoryBranches, theoryForTopic, topicsForTicket } from '@/data/theoryTopics'
 import { cssLearning } from '@/data/cssLearning'
+import StudyNote from '@/components/StudyNote.vue'
+import { plainExplanations, ticketPlainExplanations } from '@/data/plainExplanations'
+import { notifyProgress } from '@/store/notifications'
 
 const route = useRoute()
 const router = useRouter()
@@ -31,6 +34,12 @@ const content = computed(() => {
   return { concepts: data.concepts.filter(c => `${c.question} ${c.definition}`.toLowerCase().includes(q)), lessons: data.lessons.filter(t => `${t.title} ${t.definition} ${t.answerOutline?.join(' ')}`.toLowerCase().includes(q)) }
 })
 const reference = computed(() => ({ html: '/semantics', css: '/css', svg: '/svg' })[topicId.value.split('.')[0]])
+function toggleLearned() {
+  const before = store.learnedTopics.length
+  const next = !learned.value
+  store.setLearned(selectedLeaves.value.map(t => t.id), next)
+  notifyProgress(next ? 'Тема отмечена как разобранная' : 'Тема возвращена к изучению', [{ label:'Разобрано тем', before:String(before), after:String(store.learnedTopics.length), change:next ? `+${store.learnedTopics.length-before} · отметку можно отменить` : 'Прогресс обновлён' }])
+}
 
 const items = computed(() => {
   let list = webTheory.filter((topic) => topic.trackId === activeTrack.value)
@@ -61,7 +70,8 @@ watch(() => route.query.track, (track) => {
     <template v-if="mode === 'topics'">
       <TheoryDiagram v-model="topicId" />
       <section class="card p-5"><h2 class="text-xl font-bold">{{ topicLabel }}</h2><p class="mt-2 text-sm text-slate-600">Определения связаны с карточками повторения. Материалы конспектов сохраняют принадлежность к экзаменационному блоку.</p><div class="mt-3 flex flex-wrap gap-3"><RouterLink v-if="reference" :to="reference" class="btn-secondary">Интерактивный справочник →</RouterLink><RouterLink v-if="theoryForTopic(topicId).concepts.length" :to="{ path: '/flashcards', query: { topic: topicId } }" class="btn-secondary">Повторить определения →</RouterLink></div></section>
-      <section class="card p-5"><div class="flex flex-wrap items-center gap-3"><button class="btn-secondary" :aria-pressed="learned" @click="store.setLearned(selectedLeaves.map(t => t.id), !learned)">{{ learned ? '✓ Разобрал · отметить как неразобранную' : selectedLeaves.length > 1 ? 'Отметить все темы ветви как разобранные' : 'Тему разобрал' }}</button><span class="text-xs text-slate-500">Отметка по вашей оценке, её можно отменить.</span></div><h3 v-if="relatedTrainers.length" class="mt-4 font-semibold">Закрепить тему</h3><div class="mt-3 flex flex-wrap gap-3"><RouterLink v-for="trainer in relatedTrainers" :key="trainer.id" :to="{path:'/trainers',query:{exercise:trainer.id}}" class="btn-secondary">{{ trainer.label }} →</RouterLink></div></section>
+      <section class="card p-5"><div class="flex flex-wrap items-center gap-3"><button class="btn-secondary" :aria-pressed="learned" @click="toggleLearned">{{ learned ? '✓ Разобрал · отметить как неразобранную' : selectedLeaves.length > 1 ? 'Отметить все темы ветви как разобранные' : 'Тему разобрал' }}</button><span class="text-xs text-slate-500">Отметка по вашей оценке, её можно отменить.</span></div><h3 v-if="relatedTrainers.length" class="mt-4 font-semibold">Закрепить тему</h3><div class="mt-3 flex flex-wrap gap-3"><RouterLink v-for="trainer in relatedTrainers" :key="trainer.id" :to="{path:'/trainers',query:{exercise:trainer.id}}" class="btn-secondary">{{ trainer.label }} →</RouterLink></div></section>
+      <StudyNote v-if="plainExplanations[topicId]" :text="plainExplanations[topicId]" />
       <label class="card p-3 text-sm">Поиск в выбранной теме<input v-model="query" type="search" class="mt-2 w-full rounded-lg border border-slate-300 p-3" placeholder="Термин или объяснение"></label>
       <TransitionGroup name="theory" tag="div" class="flex flex-col gap-3">
         <article v-for="concept in content.concepts" :key="concept.id" class="card p-5">
@@ -69,7 +79,7 @@ watch(() => route.query.track, (track) => {
           <p class="mt-3 text-xs text-slate-500">{{ cssLearning.some(c => c.id === concept.id) ? 'Дополнительное пояснение · MDN' : 'База курса · ' + [...new Set(concept.examRefs.map(id => id.startsWith('tech') ? 'Блок 1: технология' : 'Блок 2: UX/UI'))].join(' · ') }}</p>
           <a v-if="concept.mdn" :href="concept.mdn" target="_blank" rel="noreferrer" class="mt-3 inline-block text-sm text-brand-700 underline">Подробнее на MDN ↗</a>
         </article>
-        <article v-for="lesson in content.lessons" :key="lesson.id" class="card p-5"><p class="mb-2 text-xs text-slate-500">{{ lesson.trackId === 'tech' ? 'Блок 1: технология' : 'Блок 2: UX/UI' }} · вопрос {{ lesson.number }}</p><h3 class="font-bold">{{ lesson.title }}</h3><div class="mt-3 text-sm"><RichText :text="lesson.definition" /></div><ul class="mt-3 list-disc space-y-2 pl-5 text-sm"><li v-for="step in lesson.answerOutline" :key="step"><RichText :text="step" /></li></ul><p v-if="lesson.pitfalls?.length" class="mt-4 font-semibold text-sm">Частые ошибки</p><ul class="mt-2 list-disc space-y-2 pl-5 text-sm"><li v-for="pitfall in lesson.pitfalls" :key="pitfall"><RichText :text="pitfall" /></li></ul></article>
+        <article v-for="lesson in content.lessons" :key="lesson.id" class="card p-5"><p class="mb-2 text-xs text-slate-500">{{ lesson.trackId === 'tech' ? 'Блок 1: технология' : 'Блок 2: UX/UI' }} · вопрос {{ lesson.number }}</p><h3 class="font-bold">{{ lesson.title }}</h3><div class="mt-3 text-sm"><RichText :text="lesson.definition" /></div><ul class="mt-3 list-disc space-y-2 pl-5 text-sm"><li v-for="step in lesson.answerOutline" :key="step"><RichText :text="step" /></li></ul><StudyNote v-if="lesson.pitfalls?.length" class="mt-4" kind="errors" :items="lesson.pitfalls" /></article>
       </TransitionGroup>
       <p v-if="!content.concepts.length && !content.lessons.length" class="card p-5">По этому запросу ничего не найдено.</p>
     </template>
@@ -109,16 +119,14 @@ watch(() => route.query.track, (track) => {
             <template v-if="topic.status === 'ready'">
               <div class="mt-3 flex flex-wrap gap-2"><RouterLink v-for="related in topicsForTicket(topic.id)" :key="related.id" :to="{path:'/theory',query:{topic:related.id}}" class="btn-secondary" @click="topicId = related.id; mode = 'topics'">Тема: {{ related.label }} →</RouterLink></div>
               <div class="mt-3 text-sm leading-relaxed text-slate-700"><RichText :text="topic.definition" /></div>
+              <StudyNote v-if="ticketPlainExplanations[topic.id]" class="mt-4" :text="ticketPlainExplanations[topic.id]" />
               <div class="mt-2 text-sm text-slate-500"><span class="font-semibold text-slate-600">Зачем учить:</span> <RichText :text="topic.why" /></div>
               <details class="mt-4 rounded-xl bg-slate-50 p-4">
                 <summary class="cursor-pointer font-semibold text-slate-700">Открыть структуру ответа на билет</summary>
                 <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
                   <li v-for="step in topic.answerOutline" :key="step"><RichText :text="step" /></li>
                 </ol>
-                <h3 class="mt-4 text-sm font-semibold text-slate-700">Типичные ошибки</h3>
-                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
-                  <li v-for="pitfall in topic.pitfalls" :key="pitfall"><RichText :text="pitfall" /></li>
-                </ul>
+                <StudyNote v-if="topic.pitfalls?.length" class="mt-4" kind="errors" :items="topic.pitfalls" />
               </details>
             </template>
             <template v-else>

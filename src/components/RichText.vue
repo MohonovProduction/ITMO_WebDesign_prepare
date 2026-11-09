@@ -1,29 +1,10 @@
 <script setup>
 import { computed } from 'vue'
+import { studyTextBlocks } from '@/utils/typography'
 
 const props = defineProps({ text: { type: String, default: '' } })
 
-function inlineParts(value) {
-  return value.split(/(`[^`]+`)/g).filter(Boolean).map((part) => ({
-    type: part.startsWith('`') && part.endsWith('`') ? 'code' : 'text',
-    value: part.startsWith('`') && part.endsWith('`') ? part.slice(1, -1) : part,
-  }))
-}
-
-const blocks = computed(() => {
-  const result = []
-  const pattern = /```(?:[\w+-]+)?\n?([\s\S]*?)```/g
-  let lastIndex = 0
-  let match
-
-  while ((match = pattern.exec(props.text)) !== null) {
-    if (match.index > lastIndex) result.push({ type: 'text', parts: inlineParts(props.text.slice(lastIndex, match.index)) })
-    result.push({ type: 'block', value: match[1].trim() })
-    lastIndex = pattern.lastIndex
-  }
-  if (lastIndex < props.text.length) result.push({ type: 'text', parts: inlineParts(props.text.slice(lastIndex)) })
-  return result
-})
+const blocks = computed(() => studyTextBlocks(props.text))
 </script>
 
 <template>

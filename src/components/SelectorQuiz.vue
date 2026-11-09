@@ -4,6 +4,8 @@ import { selectorExercises, selectorMarkup } from '@/data/cssLearning'
 import { createSelectorMatcher } from '@/utils/selectorMatcher'
 import { useWebProgressStore } from '@/store/webProgress'
 import ChoiceChips from './ChoiceChips.vue'
+import { trainingSnapshot, completionRows } from '@/utils/trainingFeedback'
+import { notifyProgress } from '@/store/notifications'
 const store = useWebProgressStore()
 const index = ref(0)
 const mode = ref('choice')
@@ -11,6 +13,8 @@ const selected = ref('')
 const typed = ref('')
 const feedback = ref(null)
 const answers = ref({})
+let initialProgress = trainingSnapshot(store)
+let completed = false
 const task = computed(() => selectorExercises[index.value])
 const evaluate = createSelectorMatcher(selectorMarkup)
 const result = computed(() => evaluate(mode.value === 'input' ? typed.value : selected.value))
@@ -23,11 +27,15 @@ function submit(option) {
   feedback.value = correct
   answers.value[`${mode.value}:${task.value.id}`] = correct
   store.recordExercise(`selectors-${mode.value}:${task.value.id}`, correct)
+  if (index.value === selectorExercises.length - 1 && !completed) {
+    completed = true
+    notifyProgress('CSS-селекторы: подход завершён', completionRows(initialProgress, trainingSnapshot(store)))
+  }
 }
 function choose(option) { selected.value = option; submit(option) }
 function resetAnswer() { selected.value = ''; typed.value = ''; feedback.value = null }
 function next() { index.value++; resetAnswer() }
-function restart() { index.value = 0; answers.value = {}; resetAnswer() }
+function restart() { index.value = 0; answers.value = {}; resetAnswer(); completed = false; initialProgress = trainingSnapshot(store) }
 watch(mode, restart)
 watch(typed, () => { feedback.value = null })
 </script>
