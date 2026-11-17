@@ -1,10 +1,12 @@
 import { expandedConcepts } from './expandedConcepts.js'
 import { cssLearning } from './cssLearning.js'
+import { teamConcepts } from './teamLanguage.js'
 // Единственный источник определений. ID учебных карточек остаются стабильными.
 function concept(id, deck, question, definition, examRefs) {
   return { id, deck, question, definition, examRefs }
 }
 const studyConcepts = [
+  ...teamConcepts,
   ...cssLearning,
   ...expandedConcepts,
   concept('css-selectors', 'css', 'Что делает CSS-селектор?', 'Селектор выбирает HTML-элементы, к которым применяется правило. Например, `article p` выбирает абзацы внутри статьи, а `.lead` — элементы с классом `lead`.', ['tech-3', 'tech-5']),

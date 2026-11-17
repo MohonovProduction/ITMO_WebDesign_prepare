@@ -6,9 +6,9 @@ const lesson = (id, label, tickets) => ({ id, label, tickets })
 export const theoryBranches = [
   ...topicBranches.map(branch => ({ ...branch, children: branch.children.map(child => ({ ...child, tickets: [] })) })),
   { id: 'web', label: 'Устройство веба', children: [lesson('web.environment', 'Браузер, сеть и сервер', ['tech-1', 'tech-2', 'tech-3']), lesson('web.quality', 'Качество и публикация', ['tech-8', 'tech-9', 'tech-14', 'tech-15', 'tech-16'])] },
-  { id: 'product', label: 'Продукт и команда', children: [lesson('product.design', 'Дизайн-концепция', ['tech-4']), lesson('product.process', 'Процесс и развитие', ['tech-10', 'tech-11', 'tech-12', 'tech-13'])] },
 ]
 const ticketTopics = {
+  'product.design':['tech-4'], 'product.process':['tech-10','tech-11','tech-12','tech-13'],
   'css.type': ['tech-5'], 'html.forms': ['tech-6', 'tech-7'],
   'ux.definitions': ['ux-1'], 'ux.research': ['ux-2', 'ux-3', 'ux-4', 'ux-5'],
   'ux.structure': ['ux-6', 'ux-7'], 'ux.accessibility': ['ux-8', 'ux-9'], 'ux.handoff': ['ux-10'],

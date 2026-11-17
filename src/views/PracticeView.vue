@@ -5,6 +5,7 @@ import { TRACKS } from '@/data/tracks'
 import RichText from '@/components/RichText.vue'
 import { useWebProgressStore } from '@/store/webProgress'
 import { notifyProgress } from '@/store/notifications'
+import StudyNote from '@/components/StudyNote.vue'
 
 const store = useWebProgressStore()
 store.rememberActivity('/practice', 'Экзаменационный ответ')
@@ -113,7 +114,7 @@ function trackTitle(id) { return TRACKS.find((track) => track.id === id)?.shortT
           <ol class="mt-4 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
             <li v-for="step in topic.answerOutline" :key="step"><RichText :text="step" /></li>
           </ol>
-          <div class="mt-4 text-sm text-slate-600"><span class="font-semibold">Типичная ошибка:</span> <RichText :text="topic.pitfalls[0]" /></div>
+          <StudyNote v-if="topic.pitfalls?.length" class="mt-4" kind="errors" :items="[topic.pitfalls[0]]" />
         </div>
       </div>
     </section>

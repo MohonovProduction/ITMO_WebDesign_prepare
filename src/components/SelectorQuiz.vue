@@ -6,6 +6,7 @@ import { useWebProgressStore } from '@/store/webProgress'
 import ChoiceChips from './ChoiceChips.vue'
 import { trainingSnapshot, completionRows } from '@/utils/trainingFeedback'
 import { notifyProgress } from '@/store/notifications'
+import { celebrate } from '@/utils/celebration'
 const store = useWebProgressStore()
 const index = ref(0)
 const mode = ref('choice')
@@ -15,27 +16,33 @@ const feedback = ref(null)
 const answers = ref({})
 let initialProgress = trainingSnapshot(store)
 let completed = false
+const celebrated = new Set()
 const task = computed(() => selectorExercises[index.value])
 const evaluate = createSelectorMatcher(selectorMarkup)
 const result = computed(() => evaluate(mode.value === 'input' ? typed.value : selected.value))
 const matches = computed(() => result.value.lines)
 const answered = computed(() => feedback.value !== null)
 const score = computed(() => selectorExercises.filter(t => answers.value[`${mode.value}:${t.id}`] === true).length)
-function submit(option) {
+function submit(option, event) {
   if (answered.value || result.value.error) return
   const correct = mode.value === 'choice' ? option === task.value.answer : result.value.total === task.value.target.length && JSON.stringify(matches.value) === JSON.stringify(task.value.target)
   feedback.value = correct
   answers.value[`${mode.value}:${task.value.id}`] = correct
   store.recordExercise(`selectors-${mode.value}:${task.value.id}`, correct)
-  if (index.value === selectorExercises.length - 1 && !completed) {
+  const final = index.value === selectorExercises.length - 1
+  const anchor = event?.submitter || event?.currentTarget
+  if (final && !completed) {
     completed = true
-    notifyProgress('CSS-селекторы: подход завершён', completionRows(initialProgress, trainingSnapshot(store)))
+    const after = trainingSnapshot(store)
+    notifyProgress('CSS-селекторы: подход завершён', completionRows(initialProgress, after))
+    if (after.mastered > initialProgress.mastered) celebrate('complete', anchor)
   }
+  if (!final && correct && !celebrated.has(task.value.id)) { celebrated.add(task.value.id); celebrate('answer', anchor) }
 }
-function choose(option) { selected.value = option; submit(option) }
+function choose(option, event) { selected.value = option; submit(option, event) }
 function resetAnswer() { selected.value = ''; typed.value = ''; feedback.value = null }
 function next() { index.value++; resetAnswer() }
-function restart() { index.value = 0; answers.value = {}; resetAnswer(); completed = false; initialProgress = trainingSnapshot(store) }
+function restart() { index.value = 0; answers.value = {}; resetAnswer(); completed = false; celebrated.clear(); initialProgress = trainingSnapshot(store) }
 watch(mode, restart)
 watch(typed, () => { feedback.value = null })
 </script>
@@ -49,8 +56,8 @@ watch(typed, () => { feedback.value = null })
       <h3 class="my-3 font-semibold">{{ task.requirement }}</h3>
       <p class="mb-2 text-xs text-slate-600">◎ — цель. ✓ — совпадение вашего селектора. Подсвечивается открывающая строка элемента.</p>
       <pre class="overflow-x-auto rounded-xl bg-slate-950 p-3 text-sm leading-7 text-slate-100"><code v-for="(line, n) in selectorMarkup.split('\n')" :key="n" class="block rounded px-2 transition-colors" :class="matches.includes(n) ? 'bg-teal-800' : task.target.includes(n) ? 'bg-slate-700' : ''">{{ task.target.includes(n) ? '◎' : ' ' }}{{ matches.includes(n) ? '✓' : ' ' }} {{ line }}</code></pre>
-      <div v-if="mode === 'choice'" class="mt-4 flex flex-wrap gap-3" role="group" aria-label="Варианты селектора"><button v-for="option in task.options" :key="option" class="btn-secondary" :class="selected === option ? 'ring-2 ring-brand-700' : ''" :disabled="answered" @click="choose(option)"><code>{{ option }}</code></button></div>
-      <form v-else class="mt-4" @submit.prevent="submit()"><label for="selector-input" class="text-sm font-semibold">Ваш CSS-селектор</label><input id="selector-input" v-model="typed" autocomplete="off" autocapitalize="off" :spellcheck="false" class="mt-2 w-full rounded-xl border border-slate-300 p-3 font-mono" placeholder="Например, .card > p" :aria-invalid="!!result.error" aria-describedby="selector-hint"><p id="selector-hint" class="mt-2 text-sm text-slate-600" aria-live="polite">{{ result.error || `Найдено элементов: ${result.total}` }}</p><p class="mt-1 text-xs text-slate-500">Учебный фрагмент статичен: :hover и другие состояния взаимодействия здесь не включаются.</p><button class="btn-primary mt-3" :disabled="!typed.trim() || !!result.error || answered" type="submit">Проверить селектор</button></form>
+      <div v-if="mode === 'choice'" class="mt-4 flex flex-wrap gap-3" role="group" aria-label="Варианты селектора"><button v-for="option in task.options" :key="option" class="btn-secondary" :class="selected === option ? 'ring-2 ring-brand-700' : ''" :disabled="answered" @click="choose(option, $event)"><code>{{ option }}</code></button></div>
+      <form v-else class="mt-4" @submit.prevent="submit(undefined, $event)"><label for="selector-input" class="text-sm font-semibold">Ваш CSS-селектор</label><input id="selector-input" v-model="typed" autocomplete="off" autocapitalize="off" :spellcheck="false" class="mt-2 w-full rounded-xl border border-slate-300 p-3 font-mono" placeholder="Например, .card > p" :aria-invalid="!!result.error" aria-describedby="selector-hint"><p id="selector-hint" class="mt-2 text-sm text-slate-600" aria-live="polite">{{ result.error || `Найдено элементов: ${result.total}` }}</p><p class="mt-1 text-xs text-slate-500">Учебный фрагмент статичен: :hover и другие состояния взаимодействия здесь не включаются.</p><button class="btn-primary mt-3" :disabled="!typed.trim() || !!result.error || answered" type="submit">Проверить селектор</button></form>
       <div v-if="answered" role="status" class="mt-4 rounded-xl bg-brand-50 p-4"><p class="font-bold">{{ feedback ? 'Верно' : 'Попробуем разобраться' }}</p><p class="mt-2 text-sm">{{ task.explanation }}</p><p class="mt-2 text-sm">Пример решения: <code>{{ task.answer }}</code>. Совпадений у выбранного: {{ result.total }}.</p><p v-if="mode === 'input' && !feedback" class="mt-2 text-sm">Измените селектор и проверьте ещё раз.</p></div>
     </div></Transition>
     <button v-if="answered && index < selectorExercises.length - 1" class="btn-primary mt-4" @click="next">Следующее задание →</button>

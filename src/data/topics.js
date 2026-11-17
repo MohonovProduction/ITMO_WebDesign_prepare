@@ -1,4 +1,5 @@
 export const topicBranches = [
+  { id:'product', deck:'definitions', label:'Продукт и команда', children:[{id:'product.design',label:'Дизайн-концепция'},{id:'product.process',label:'Процесс и развитие'},{id:'product.language',label:'Язык команды'}] },
   { id: 'html', deck: 'semantic', label: 'HTML', children: [{ id: 'html.structure', label: 'Структура страницы' }, { id: 'html.forms', label: 'Формы и поля ввода' }] },
   { id: 'css', deck: 'css', label: 'CSS', children: [{ id: 'css.selectors', label: 'Селекторы' }, { id: 'css.appearance', label: 'Цвет и фон' }, { id: 'css.box', label: 'Box model' }, { id: 'css.type', label: 'Типографика' }, { id: 'css.states', label: 'Состояния' }, { id: 'css.layout', label: 'Position, Flex, Grid' }, { id: 'css.units', label: 'Единицы и адаптив' }] },
   { id: 'svg', deck: 'svg', label: 'SVG', children: [{ id: 'svg.shapes', label: 'Фигуры и пути' }, { id: 'svg.structure', label: 'Группы и координаты' }, { id: 'svg.embedding', label: 'Вставка и доступность' }] },

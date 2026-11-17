@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ChoiceChips from '@/components/ChoiceChips.vue'
 import Flashcard from '@/components/Flashcard.vue'
+import RichText from '@/components/RichText.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 import { WEB_DECKS, cardsByDeck, webFlashcards } from '@/data/webFlashcards'
 import { matchesTopic, topicBranches } from '@/data/topics'
@@ -106,6 +107,7 @@ watch([activeDeck, topic, filter, () => current.value?.id], () => {
         <button class="text-brand-700 hover:underline" @click="resetDeck">Сбросить отметки темы</button>
       </div>
       <Flashcard :card="current" :flipped="flipped" :status="marks[current.id] || null" @flip="flipped = !flipped" @know="mark('known')" @dontknow="mark('unknown')" />
+      <div v-if="current.supplemental" class="card mt-4 p-4 text-sm"><p class="text-xs text-slate-500">Дополнение к курсу · Язык команды</p><template v-if="flipped"><p class="mt-3 font-semibold">Пример</p><RichText :text="current.example" /><p class="mt-3 font-semibold">Не перепутайте</p><RichText :text="current.pitfall" /></template><RouterLink :to="{path:'/theory',query:{topic:current.topic,concept:current.conceptId}}" class="mt-3 inline-block font-semibold text-brand-700 underline">Разобрать в теории →</RouterLink></div>
       <p class="mt-4 text-center text-xs text-slate-400">Связанные вопросы: {{ current.examRefs.map((id) => id.replace('-', ' №')).join(', ') }}</p>
       <div class="mt-3 flex items-center justify-between">
         <button class="btn-secondary" @click="go(-1)">← Назад</button><button class="btn-secondary" @click="flipped = !flipped">Перевернуть</button><button class="btn-secondary" @click="go(1)">Вперёд →</button>

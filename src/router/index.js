@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { stopCelebration } from '@/utils/celebration'
 
 import HomeView from '@/views/HomeView.vue'
 
@@ -48,6 +49,7 @@ const router = createRouter({
   },
 })
 
+router.beforeEach((to, from) => { if (to.path !== from.path || (from.path === '/trainers' && to.query.exercise !== from.query.exercise)) stopCelebration() })
 router.afterEach((to) => {
   const base = 'Веб-проектирование · подготовка к экзамену'
   document.title = to.meta?.title ? `${to.meta.title} · ${base}` : base

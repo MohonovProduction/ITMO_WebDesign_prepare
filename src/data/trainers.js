@@ -1,6 +1,8 @@
 import { semanticsExercises, formsExercises } from './htmlExercises.js'
 import { selectorExercises } from './cssLearning.js'
+import { teamExercises } from './teamLanguage.js'
 export const trainers = [
+  {id:'team',label:'Язык команды',description:'Sync, Daily, Backlog, Retro, Story point и Feature: значения и рабочие ситуации.',topics:['product.language'],questions:teamExercises},
   { id:'selectors', label:'CSS-селекторы', description:'Выберите или напишите селектор и посмотрите, что он находит.', topics:['css.selectors'], questions:selectorExercises },
   { id:'semantics', label:'Семантика HTML', description:'Выберите тег по смыслу и контексту.', topics:['html.structure'], questions:semanticsExercises },
   { id:'forms', label:'Формы и типы input', description:'Подберите поле для задачи. Немного вопросов об отправляемых данных.', topics:['html.forms'], questions:formsExercises },
