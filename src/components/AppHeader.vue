@@ -19,6 +19,7 @@ const groups = [
     {to:'/semantics',label:'HTML',description:'Структура, формы и input'},
     {to:'/css',label:'CSS',description:'Основы, box model и раскладка'},
     {to:'/svg',label:'SVG',description:'Фигуры и интерактивные схемы'},
+    {to:'/agile',label:'Agile и Scrum',description:'Шесть терминов на примере проекта'},
   ]},
 ]
 function selected(group) { return group.links.some(item=>item.to === route.path) }

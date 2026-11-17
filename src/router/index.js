@@ -38,6 +38,7 @@ const routes = [
   },
   { path: '/css', name: 'css', component: () => import('@/views/CssReferenceView.vue'), meta: { title: 'CSS' } },
   { path: '/svg', name: 'svg', component: () => import('@/views/SvgReferenceView.vue'), meta: { title: 'SVG' } },
+  { path:'/agile', name:'agile', component:() => import('@/views/AgileReferenceView.vue'), meta:{title:'Agile и Scrum'} },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
