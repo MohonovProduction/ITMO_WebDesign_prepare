@@ -5,8 +5,10 @@ import { theoryBranches, theoryForTopic } from '@/data/theoryTopics'
 import { webFlashcards } from '@/data/webFlashcards'
 import { exerciseIds, trainersForTopic } from '@/data/trainers'
 import { learningStats } from '@/utils/learningStats'
+import { courseworkProgress } from '@/data/coursework'
 import { useWebProgressStore } from '@/store/webProgress'
 const store = useWebProgressStore()
+const course = computed(() => courseworkProgress(store.coursework))
 const leaves = theoryBranches.flatMap(b => b.children)
 const stats = computed(() => learningStats(store, webFlashcards, leaves.map(t => t.id), exerciseIds))
 const nextTopic = computed(() => leaves.find(t => !store.learnedTopics.includes(t.id)))
@@ -25,6 +27,7 @@ const percent = (value,total) => total ? Math.round(value/total*100) : 0
     <section v-if="stats.unknown || nextTopic" class="card p-5"><h2 class="text-lg font-bold">Следующий шаг</h2><div class="mt-3 flex flex-wrap gap-3"><RouterLink v-if="stats.unknown" to="/flashcards?filter=unknown" class="btn-primary">Повторить незнакомые · {{ stats.unknown }}</RouterLink><RouterLink v-if="nextTopic" :to="{path:'/theory',query:{topic:nextTopic.id}}" class="btn-secondary">Разобраться: {{ nextTopic.label }} →</RouterLink></div></section>
     <section><h2 class="mb-4 text-xl font-bold">Что изучаем</h2><div class="grid gap-4 sm:grid-cols-2"><article v-for="branch in theoryBranches" :key="branch.id" class="card p-5"><h3 class="text-lg font-bold">{{ branch.label }}</h3><p class="mt-2 text-sm text-slate-500">Разобрано {{ branch.children.filter(t => store.learnedTopics.includes(t.id)).length }} из {{ branch.children.length }} тем</p><div class="mt-4 flex flex-wrap gap-3"><RouterLink :to="{path:'/theory',query:{topic:branch.id}}" class="btn-secondary">Теория</RouterLink><RouterLink v-if="theoryForTopic(branch.id).concepts.length" :to="{path:'/flashcards',query:{topic:branch.id}}" class="btn-secondary">Карточки</RouterLink><RouterLink v-if="trainersForTopic(branch.id).length" :to="{path:'/trainers',query:{topic:branch.id}}" class="btn-secondary">Практика</RouterLink></div></article></div></section>
     <section class="card p-5"><h2 class="text-lg font-bold">Подготовка по билетам</h2><div class="mt-4 flex flex-wrap gap-3"><RouterLink v-for="track in TRACKS" :key="track.id" :to="{path:'/theory',query:{track:track.id}}" class="btn-secondary">{{ track.title }}</RouterLink><RouterLink to="/practice" class="btn-secondary">Проговорить ответ</RouterLink></div><p class="mt-3 text-xs text-slate-500">Сохранено тренировок ответа: {{ store.attempts.length }} · дней подготовки: {{ store.prepDays.length }}</p></section>
+    <section class="card p-5" aria-labelledby="home-coursework"><div class="flex flex-wrap items-baseline justify-between gap-3"><h2 id="home-coursework" class="text-lg font-bold">Курсовая работа</h2><span class="text-sm text-slate-600">{{ course.done }} / {{ course.total }} выполнено · {{ course.percent }}%</span></div><progress class="mt-4 w-full" :value="course.done" :max="course.total" aria-label="Готовность чеклиста курсовой"/><p class="mt-3 text-sm text-slate-600">Условие и чеклист по пяти разделам оценки. Прогресс самопроверки учитывается отдельно от обучения.</p><RouterLink to="/coursework" class="btn-secondary mt-4">Открыть курсовую →</RouterLink></section>
     <section class="card p-5"><h2 class="text-lg font-bold">Интерактивные справочники</h2><div class="mt-4 flex flex-wrap gap-3"><RouterLink to="/semantics" class="btn-secondary">HTML</RouterLink><RouterLink to="/css" class="btn-secondary">CSS</RouterLink><RouterLink to="/svg" class="btn-secondary">SVG</RouterLink></div></section>
   </div>
 </template>

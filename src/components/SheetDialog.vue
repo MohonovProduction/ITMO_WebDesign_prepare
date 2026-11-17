@@ -21,7 +21,7 @@ watch(() => props.modelValue, async value => {
 onBeforeUnmount(() => dialog.value?.close())
 </script>
 <template>
-  <Teleport to="body"><dialog ref="dialog" class="sheet-dialog" :aria-label="title" @cancel.prevent="close" @click="event => { if(event.target === dialog) close() }" @close="$emit('update:modelValue', false)"><div class="sheet-inner"><div class="mb-4 flex items-start justify-between gap-4"><h2 class="text-xl font-bold">{{ title }}</h2><button class="btn-secondary" aria-label="Закрыть разминку" @click="close">Закрыть</button></div><slot :close="close" /></div></dialog></Teleport>
+  <Teleport to="body"><dialog ref="dialog" class="sheet-dialog" :aria-label="title" @cancel.prevent="close" @click="event => { if(event.target === dialog) close() }" @close="$emit('update:modelValue', false)"><div class="sheet-inner"><div class="mb-4 flex items-start justify-between gap-4"><h2 class="text-xl font-bold">{{ title }}</h2><button class="btn-secondary" aria-label="Закрыть окно" @click="close">Закрыть</button></div><slot :close="close" /></div></dialog></Teleport>
 </template>
 <style scoped>
 .sheet-dialog { position:fixed;inset:auto 0 0;margin:0 auto;width:100%;max-width:720px;max-height:90dvh;border:0;border-radius:24px 24px 0 0;padding:0;background:#f8fafc;color:#334155;box-shadow:0 -8px 50px #0f172a30;overflow:auto;overscroll-behavior:contain; }

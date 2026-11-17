@@ -5,6 +5,7 @@ export function sanitizeProgress(value) {
   const data = object(value) ? value : {}
   return {
     version: 1,
+    coursework: object(data.coursework) ? Object.fromEntries(Object.entries(data.coursework).filter(([id, done]) => id && done === true)) : {},
     learnedTopics: Array.isArray(data.learnedTopics) ? [...new Set(data.learnedTopics.filter(id => typeof id === 'string'))] : [],
     exercises: object(data.exercises) ? Object.fromEntries(Object.entries(data.exercises).filter(([id, r]) => id && object(r) && Number.isInteger(r.attempts) && r.attempts > 0 && Number.isInteger(r.correctAttempts) && r.correctAttempts >= 0 && r.correctAttempts <= r.attempts && Number.isFinite(r.at)).map(([id, r]) => [id, { attempts: r.attempts, correctAttempts: r.correctAttempts, at: r.at }])) : {},
     warmupDay: typeof data.warmupDay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(data.warmupDay) ? data.warmupDay : '',

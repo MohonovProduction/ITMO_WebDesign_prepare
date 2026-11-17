@@ -18,6 +18,12 @@ export const useWebProgressStore = defineStore('webdesign-progress', {
     markCard(id, status) { this.marks[id] = status; this.recordPrepDay(); this.persist() },
     resetCards(ids) { ids.forEach(id => delete this.marks[id]); this.persist() },
     saveCardSession(session) { this.cardSession = session; this.persist() },
+    setCourseworkItem(id, checked) {
+      if (checked) this.coursework[id] = true
+      else delete this.coursework[id]
+      this.persist()
+    },
+    resetCoursework() { this.coursework = {}; this.persist() },
     setLearned(ids, learned) {
       this.learnedTopics = learned ? [...new Set([...this.learnedTopics, ...ids])] : this.learnedTopics.filter(id => !ids.includes(id))
       this.recordPrepDay(); this.persist()
