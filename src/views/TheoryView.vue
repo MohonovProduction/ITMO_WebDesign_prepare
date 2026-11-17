@@ -34,7 +34,7 @@ const content = computed(() => {
   const q = query.value.trim().toLowerCase()
   return { concepts: data.concepts.filter(c => (!route.query.concept || c.id === route.query.concept) && `${c.question} ${c.definition}`.toLowerCase().includes(q)), lessons: route.query.concept ? [] : data.lessons.filter(t => `${t.title} ${t.definition} ${t.answerOutline?.join(' ')}`.toLowerCase().includes(q)) }
 })
-const reference = computed(() => ({ html: '/semantics', css: '/css', svg: '/svg' })[topicId.value.split('.')[0]])
+const reference = computed(() => ['product','product.language'].includes(topicId.value) ? '/agile' : ({ html: '/semantics', css: '/css', svg: '/svg' })[topicId.value.split('.')[0]])
 function toggleLearned(event) {
   const before = store.learnedTopics.length
   const next = !learned.value
